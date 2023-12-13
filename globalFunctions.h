@@ -1,16 +1,22 @@
 #include <iostream>
 #include <vector>
+#include <iostream>
+#include <vector>
 #include <string>
 #include <map>
 #include <algorithm>
 #include <Windows.h>
 #include <stdio.h>
 #include <conio.h>
+#include <time.h>
 using namespace std;
 #pragma once
 
 namespace gf {
     extern map<string, char> suits;
+    extern HANDLE hConsole;
+    extern map<string, int> colours;
+    //extern deck standardDeck;
     static void coords(int x, int y);
     static void clearScreen();
 }
@@ -52,5 +58,5 @@ void gf::clearScreen() {
         console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
         screen.dwSize.X * screen.dwSize.Y, topLeft, &written
     );
-    SetConsoleCursorPosition(console, topLeft);
+    //SetConsoleCursorPosition(console, topLeft);
 }

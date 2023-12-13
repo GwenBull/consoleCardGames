@@ -1,5 +1,4 @@
-#include <map>
-#include <string>
+#include "globalFunctions.h"
 using namespace std;
 #pragma once
 

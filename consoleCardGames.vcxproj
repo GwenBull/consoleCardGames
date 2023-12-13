@@ -127,13 +127,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="button.cpp" />
     <ClCompile Include="card.cpp" />
     <ClCompile Include="consoleCardGames.cpp" />
+    <ClCompile Include="deck.cpp" />
     <ClCompile Include="globalFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="button.h" />
     <ClInclude Include="card.h" />
+    <ClInclude Include="deck.h" />
     <ClInclude Include="globalFunctions.h" />
+    <ClInclude Include="interface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
