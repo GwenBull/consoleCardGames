@@ -9,14 +9,25 @@ private:
 	vector<card> cards;
 
 public:
-	void shuffle() {
-		for (int k = 0; k < this->cards.size(); k++) {
-			unsigned int seed = static_cast<unsigned int>(time(NULL)); // forces the current time to be an integer
-			srand(seed); //sets that integer as the seed for randomisation
-			int r = k + rand() % (this->cards.size() - k); //uses the above seed to select a random card within this deck
-			swap(this->cards[k], this->cards[r]); //swaps the card at current iterator position with the randomly
-		}
-	}
+	void shuffle();
 
 	deck(vector<card> cards);
+
+	vector<card> getCards();
+
+	card drawTopCard();
+
+	void placeCardAtTop(card newCard);
+
+	void showAll();
+
+	void hideAll();
+
+	void stack(int x, int y);
+
+	void spreadVert(int x, int y);
+
+	void spreadHoriz(int x, int y);
+
+	int blackJackValue();
 };

@@ -29,20 +29,20 @@ int card::getY() {
 }
 
 void card::setPos(int newX, int newY) {
-	this->xPos = newX;
+	this->xPos = newX; //sets the x and y position of the card
 	this->yPos = newY;
 }
 
 void card::flip() {
-	this->isFaceUp = !this->isFaceUp;
+	this->isFaceUp = !this->isFaceUp; //flips this card
 }
 
 void card::render() {
-	if (this->isFaceUp) {
-		SetConsoleTextAttribute(hConsole, colours[this->colour]);
-		gf::coords(this->xPos, this->yPos);
-		cout << this->value << "    ";
-		gf::coords(this->xPos, this->yPos + 1);
+	if (this->isFaceUp) { //if the card is face up
+		SetConsoleTextAttribute(hConsole, colours[this->colour]); //sets colour to this cards colour
+		gf::coords(this->xPos, this->yPos); //moves the cursor to the top left of this card
+		cout << this->value << "    "; //draws the first line of the card
+		gf::coords(this->xPos, this->yPos + 1); //continues to create a typical card row by row
 		cout << "  " << suits[this->house] << "  ";
 		gf::coords(this->xPos, this->yPos + 2);
 		cout << "     ";
@@ -51,7 +51,7 @@ void card::render() {
 	}
 	else {
 		SetConsoleTextAttribute(hConsole, colours["blue"]);
-		gf::coords(this->xPos, this->yPos);
+		gf::coords(this->xPos, this->yPos); //draws a typical blue cardback pattern, line by line
 		cout << "\u00C9\u00CD\u00CD\u00CD\u00BB";
 		gf::coords(this->xPos, this->yPos + 1);
 		cout << "\u00BA\u00C9\u00CD\u00BB\u00BA";
