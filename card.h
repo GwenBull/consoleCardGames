@@ -9,10 +9,12 @@ private:
 	string value;
 	int xPos;
 	int yPos;
-
-public:
 	string colour;
 	bool isFaceUp;
+
+public:
+
+	card();
 
 	card(string house, string value, string colour, int xPos, int yPos);
 
@@ -24,9 +26,13 @@ public:
 
 	int getY();
 
+	bool getFace();
+
 	void setPos(int newX, int newY);
 
 	void flip();
+
+	void setFace(bool faceUp);
 
 	void render();
 };

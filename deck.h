@@ -9,9 +9,9 @@ private:
 	vector<card> cards;
 
 public:
-	void shuffle();
-
 	deck(vector<card> cards);
+
+	void shuffle();
 
 	vector<card> getCards();
 
@@ -23,11 +23,17 @@ public:
 
 	void hideAll();
 
+	void flipSpecific(int which, bool face);
+
 	void stack(int x, int y);
 
 	void spreadVert(int x, int y);
 
 	void spreadHoriz(int x, int y);
 
-	int blackJackValue();
+	string blackJackValue(string display);
+
+	int blackJackValue(int raw);
+
+	void renderAll();
 };

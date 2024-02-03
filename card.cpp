@@ -3,6 +3,8 @@
 using namespace std;
 using namespace gf;
 
+card::card() {} //default constructor
+
 card::card(string house, string value, string colour, int xPos, int yPos) {
 	this->house = house;
 	this->value = value;
@@ -28,6 +30,10 @@ int card::getY() {
 	return this->yPos;
 }
 
+bool card::getFace() {
+	return this->isFaceUp;
+}
+
 void card::setPos(int newX, int newY) {
 	this->xPos = newX; //sets the x and y position of the card
 	this->yPos = newY;
@@ -35,6 +41,10 @@ void card::setPos(int newX, int newY) {
 
 void card::flip() {
 	this->isFaceUp = !this->isFaceUp; //flips this card
+}
+
+void card::setFace(bool faceUp) {
+	this->isFaceUp = faceUp;
 }
 
 void card::render() {

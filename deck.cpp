@@ -36,14 +36,18 @@ void deck::shuffle() {
 
 void deck::showAll() {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].isFaceUp = true; //sets every card in this deck to face up
+		this->cards[i].setFace(true); //sets every card in this deck to face up
 	}
 }
 
 void deck::hideAll() {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].isFaceUp = false; //sets every card in this deck to face down
+		this->cards[i].setFace(false); //sets every card in this deck to face down
 	}
+}
+
+void deck::flipSpecific(int which, bool face) {
+	this->cards[which].setFace(face);
 }
 
 void deck::stack(int x, int y) {
@@ -64,7 +68,67 @@ void deck::spreadHoriz(int x, int y) {
 	}
 }
 
-int deck::blackJackValue() { //calculates a hand's value in a game of blackjack
+string deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack
+	int value = 0;
+	int aces = 0;
+	int unknowns = 0;
+	string returnVal = "";
+	for (int i = 0; i < this->cards.size(); i++) {
+		if (this->cards[i].getFace()) { //only face up cards
+			if (this->cards[i].getValue() == "A") {
+				value += 11;
+				aces++;
+			}
+			else if (this->cards[i].getValue() == "2") {
+				value += 2;
+			}
+			else if (this->cards[i].getValue() == "3") {
+				value += 3;
+			}
+			else if (this->cards[i].getValue() == "4") {
+				value += 4;
+			}
+			else if (this->cards[i].getValue() == "5") {
+				value += 5;
+			}
+			else if (this->cards[i].getValue() == "6") {
+				value += 6;
+			}
+			else if (this->cards[i].getValue() == "7") {
+				value += 7;
+			}
+			else if (this->cards[i].getValue() == "8") {
+				value += 8;
+			}
+			else if (this->cards[i].getValue() == "9") {
+				value += 9;
+			}
+			else if (this->cards[i].getValue() == "X" || this->cards[i].getValue() == "J" || this->cards[i].getValue() == "Q" || this->cards[i].getValue() == "K") {
+				value += 10;
+			}
+		}
+		else {
+			unknowns++;
+		}
+	}
+	while (value > 21 && aces > 0) {
+		value -= 10;
+		aces -= 1;
+	}
+
+	//converts into a string to show only what the player knows about the hand
+	for (int i = 0; i < unknowns; i++) {
+		returnVal += "?";
+		if (i == unknowns - 1) {
+			returnVal += " + ";
+		}
+	}
+	returnVal += to_string(value);
+
+	return returnVal;
+}
+
+int deck::blackJackValue(int raw) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
 	for (int i = 0; i < this->cards.size(); i++) {
@@ -105,4 +169,10 @@ int deck::blackJackValue() { //calculates a hand's value in a game of blackjack
 		aces -= 1;
 	}
 	return value;
+}
+
+void deck::renderAll() {
+	for (int i = 0; i < this->getCards().size(); i++) { //get every card in the deck
+		this->getCards()[i].render(); //and render it
+	}
 }
