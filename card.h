@@ -1,21 +1,22 @@
-#include <map>
-#include <string>
+#include "GlobalFunctions.h"
 using namespace std;
 #pragma once
 
-class card
+class Card
 {
 private:
 	string house;
 	string value;
 	int xPos;
 	int yPos;
-
-public:
 	string colour;
 	bool isFaceUp;
 
-	card(string house, string value, string colour, int xPos, int yPos);
+public:
+
+	Card();
+
+	Card(string house, string value, string colour, int xPos, int yPos);
 
 	string getHouse();
 
@@ -25,9 +26,13 @@ public:
 
 	int getY();
 
+	bool getFace();
+
 	void setPos(int newX, int newY);
 
 	void flip();
+
+	void setFace(bool faceUp);
 
 	void render();
 };
