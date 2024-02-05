@@ -1,74 +1,74 @@
-#include "deck.h"
-#include "globalFunctions.h"
+#include "Deck.h"
+#include "GlobalFunctions.h"
 using namespace std;
 
-deck::deck(vector<card> cards) {
+Deck::Deck(vector<Card> cards) {
 	this->cards = cards;
 }
 
-vector<card> deck::getCards() { 
-	return this->cards; //returns the entire set of cards in this deck/hand
+vector<Card> Deck::getCards() { 
+	return this->cards; //returns the entire set of cards in this Deck/hand
 }
 
-card deck::drawTopCard() {
-	card drawnCard = this->cards[this->cards.size() - 1]; //copies the back card
-	this->cards.pop_back(); //removes the back card from the deck
-	return drawnCard; //returns the card that has been removed
-	//because card rendering iterates forwards through each deck,
+Card Deck::drawTopCard() {
+	Card drawnCard = this->cards[this->cards.size() - 1]; //copies the back Card
+	this->cards.pop_back(); //removes the back Card from the Deck
+	return drawnCard; //returns the Card that has been removed
+	//because Card rendering iterates forwards through each Deck,
 	//the last indexed item is the one drawn at the top, so I am
 	//treating it as such.
-	//basically: the "top" of the deck, is the "back" of the vector.
+	//basically: the "top" of the Deck, is the "back" of the vector.
 	//Wait that's just a stack :p
 }
 
-void deck::placeCardAtTop(card newCard) {
-	this->cards.push_back(newCard); //puts a new card at the top of the deck
+void Deck::placeCardAtTop(Card newCard) {
+	this->cards.push_back(newCard); //puts a new Card at the top of the Deck
 }
 
-void deck::shuffle() {
-	for (int i = 0; i < this->cards.size(); i++) { //iterates through the deck
+void Deck::shuffle() {
+	for (int i = 0; i < this->cards.size(); i++) { //iterates through the Deck
 		unsigned int seed = static_cast<unsigned int>(time(NULL)); //generates a seed (current time as int)
 		srand(seed); //puts that seed into the built in random function
-		int r = i + rand() % (this->cards.size() - i); //selects a random card in the deck
-		swap(this->cards[i], this->cards[r]); //swaps card at current iteration with
+		int r = i + rand() % (this->cards.size() - i); //selects a random Card in the Deck
+		swap(this->cards[i], this->cards[r]); //swaps Card at current iteration with
 	}
 }
 
-void deck::showAll() {
+void Deck::showAll() {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setFace(true); //sets every card in this deck to face up
+		this->cards[i].setFace(true); //sets every Card in this Deck to face up
 	}
 }
 
-void deck::hideAll() {
+void Deck::hideAll() {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setFace(false); //sets every card in this deck to face down
+		this->cards[i].setFace(false); //sets every Card in this Deck to face down
 	}
 }
 
-void deck::flipSpecific(int which, bool face) {
+void Deck::flipSpecific(int which, bool face) {
 	this->cards[which].setFace(face);
 }
 
-void deck::stack(int x, int y) {
+void Deck::stack(int x, int y) {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y); //places this entire deck at the specified position
+		this->cards[i].setPos(x, y); //places this entire Deck at the specified position
 	}
 }
 
-void deck::spreadVert(int x, int y) {
+void Deck::spreadVert(int x, int y) {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y + (i * 2)); //distributes the deck vertically from a specified position
+		this->cards[i].setPos(x, y + (i * 2)); //distributes the Deck vertically from a specified position
 	}
 }
 
-void deck::spreadHoriz(int x, int y) {
+void Deck::spreadHoriz(int x, int y) {
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x + (i * 3), y); //distributes the deck horizontally from a specified position
+		this->cards[i].setPos(x + (i * 3), y); //distributes the Deck horizontally from a specified position
 	}
 }
 
-string deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack
+string Deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
 	int unknowns = 0;
@@ -128,7 +128,7 @@ string deck::blackJackValue(string display) { //calculates a hand's value in a g
 	return returnVal;
 }
 
-int deck::blackJackValue(int raw) { //calculates a hand's value in a game of blackjack
+int Deck::blackJackValue(int raw) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
 	for (int i = 0; i < this->cards.size(); i++) {
@@ -171,8 +171,8 @@ int deck::blackJackValue(int raw) { //calculates a hand's value in a game of bla
 	return value;
 }
 
-void deck::renderAll() {
-	for (int i = 0; i < this->getCards().size(); i++) { //get every card in the deck
+void Deck::renderAll() {
+	for (int i = 0; i < this->getCards().size(); i++) { //get every Card in the Deck
 		this->getCards()[i].render(); //and render it
 	}
 }

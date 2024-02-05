@@ -1,11 +1,11 @@
-﻿#include "card.h"
-#include "globalFunctions.h"
+﻿#include "Card.h"
+#include "GlobalFunctions.h"
 using namespace std;
 using namespace gf;
 
-card::card() {} //default constructor
+Card::Card() {} //default constructor
 
-card::card(string house, string value, string colour, int xPos, int yPos) {
+Card::Card(string house, string value, string colour, int xPos, int yPos) {
 	this->house = house;
 	this->value = value;
 	this->colour = colour;
@@ -14,40 +14,40 @@ card::card(string house, string value, string colour, int xPos, int yPos) {
 	this->isFaceUp = true;
 }
 
-string card::getHouse() {
+string Card::getHouse() {
 	return this->house;
 }
 
-string card::getValue() {
+string Card::getValue() {
 	return this->value;
 }
 
-int card::getX() {
+int Card::getX() {
 	return this->xPos;
 }
 
-int card::getY() {
+int Card::getY() {
 	return this->yPos;
 }
 
-bool card::getFace() {
+bool Card::getFace() {
 	return this->isFaceUp;
 }
 
-void card::setPos(int newX, int newY) {
+void Card::setPos(int newX, int newY) {
 	this->xPos = newX; //sets the x and y position of the card
 	this->yPos = newY;
 }
 
-void card::flip() {
+void Card::flip() {
 	this->isFaceUp = !this->isFaceUp; //flips this card
 }
 
-void card::setFace(bool faceUp) {
+void Card::setFace(bool faceUp) {
 	this->isFaceUp = faceUp;
 }
 
-void card::render() {
+void Card::render() {
 	if (this->isFaceUp) { //if the card is face up
 		SetConsoleTextAttribute(hConsole, colours[this->colour]); //sets colour to this cards colour
 		gf::coords(this->xPos, this->yPos); //moves the cursor to the top left of this card

@@ -127,19 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="button.cpp" />
-    <ClCompile Include="card.cpp" />
-    <ClCompile Include="consoleCardGames.cpp" />
-    <ClCompile Include="deck.cpp" />
-    <ClCompile Include="globalFunctions.cpp" />
-    <ClCompile Include="userInterface.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="ConsoleCardGames.cpp" />
+    <ClCompile Include="Deck.cpp" />
+    <ClCompile Include="GlobalFunctions.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="button.h" />
-    <ClInclude Include="card.h" />
-    <ClInclude Include="deck.h" />
-    <ClInclude Include="globalFunctions.h" />
-    <ClInclude Include="userInterface.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="Deck.h" />
+    <ClInclude Include="GlobalFunctions.h" />
+    <ClInclude Include="UserInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

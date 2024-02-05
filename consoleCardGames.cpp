@@ -1,6 +1,7 @@
-﻿#include "globalFunctions.h"
-#include "card.h"
-#include "deck.h"
+﻿#include "GlobalFunctions.h"
+#include "Card.h"
+#include "Deck.h"
+#include "Button.h"
 using namespace std;
 using namespace gf;
 
@@ -10,7 +11,7 @@ int whiteText = 7;
 int whoseTurn = 0;
 vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 30}, {100, 20}, {125, 10}, {75, 0} };
 vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 31}, {100, 21}, {125, 11}, {75, 1} };
-vector<deck> turnOrder;
+vector<Deck> turnOrder;
 vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 35}, {100, 25}, {125, 15}, {75, 5} };
 
 void init() {
@@ -32,7 +33,7 @@ void init() {
 		char chari = i;
 		cout << i << ": " << chari << "\n";
 	}
-	clearScreen();
+	//clearScreen();
 	coords(0, 0);
 	SetConsoleTextAttribute(hConsole, 7);
 	cout << "Game ready, press any key to continue";
@@ -40,17 +41,17 @@ void init() {
 	clearScreen();
 }
 
-void firstDeal(deck* mainPile, deck* dealer, deck* player, deck* ai1, deck* ai2, deck* ai3, deck* ai4) {
-	card drawnCard;
-	vector<deck*> dealOrder = { ai1, ai2, player, ai3, ai4, dealer };
+void firstDeal(Deck* mainPile, Deck* dealer, Deck* player, Deck* ai1, Deck* ai2, Deck* ai3, Deck* ai4) {
+	Card drawnCard;
+	vector<Deck*> dealOrder = { ai1, ai2, player, ai3, ai4, dealer };
 	for (int i = 0; i < 2; i++) { //for the 2 initial cards per player
 		for (int j = 0; j < 6; j++) { //for each player + dealer
-			Sleep(830); //wait a reasonable time
-			drawnCard = mainPile->drawTopCard(); //draw a card
-			if (j == 2 || (j == 5 && i == 1)) { //if it's the player's card or the dealers last card
+			Sleep(415); //wait a reasonable time
+			drawnCard = mainPile->drawTopCard(); //draw a Card
+			if (j == 2 || (j == 5 && i == 1)) { //if it's the player's Card or the dealers last Card
 				drawnCard.flip(); //make it visible
 			}
-			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
+			dealOrder[j]->placeCardAtTop(drawnCard); //deal the Card
 			dealOrder[j]->spreadHoriz(handCoords[j][0], handCoords[j][1]); //put it in the right position
 			dealOrder[j]->renderAll(); //render it
 		}
@@ -61,36 +62,38 @@ int main() {
 	int currentTotal;
 	init();
 
-	card drawnCard;
-	deck standardDeck = deck(
-		vector<card>{
-			card("diamonds", "A", "red", 6, 0), card("diamonds", "2", "red", 0, 0), card("diamonds", "3", "red", 0, 0), card("diamonds", "4", "red", 0, 0),
-			card("diamonds", "5", "red", 0, 0), card("diamonds", "6", "red", 0, 0), card("diamonds", "7", "red", 0, 0), card("diamonds", "8", "red", 0, 0), 
-			card("diamonds", "9", "red", 0, 0), card("diamonds", "X", "red", 0, 0), card("diamonds", "J", "red", 0, 0), card("diamonds", "Q", "red", 0, 0), 
-			card("diamonds", "K", "red", 0, 0),
-			card("clubs", "A", "black", 0, 0), card("clubs", "2", "black", 0, 8), card("clubs", "3", "black", 0, 0), card("clubs", "4", "black", 0, 0),
-			card("clubs", "5", "black", 0, 0), card("clubs", "6", "black", 0, 0), card("clubs", "7", "black", 0, 0), card("clubs", "8", "black", 0, 0), 
-			card("clubs", "9", "black", 0, 0), card("clubs", "X", "black", 0, 0), card("clubs", "J", "black", 0, 0), card("clubs", "Q", "black", 0, 0), 
-			card("clubs", "K", "black", 0, 0),
-			card("hearts", "A", "red", 0, 0), card("hearts", "2", "red", 0, 0), card("hearts", "3", "red", 0, 0), card("hearts", "4", "red", 0, 0),
-			card("hearts", "5", "red", 0, 0), card("hearts", "6", "red", 4, 5), card("hearts", "7", "red", 0, 0), card("hearts", "8", "red", 0, 0), 
-			card("hearts", "9", "red", 0, 0), card("hearts", "X", "red", 0, 0), card("hearts", "J", "red", 0, 0), card("hearts", "Q", "red", 0, 0), 
-			card("hearts", "K", "red", 0, 0),
-			card("spades", "A", "black", 0, 0), card("spades", "2", "black", 0, 0), card("spades", "3", "black", 0, 0), card("spades", "4", "black", 0, 0), 
-			card("spades", "5", "black", 0, 0), card("spades", "6", "black", 0, 0), card("spades", "7", "black", 0, 0), card("spades", "8", "black", 0, 0), 
-			card("spades", "9", "black", 0, 0), card("spades", "X", "black", 0, 0), card("spades", "J", "black", 0, 0), card("spades", "Q", "black", 0, 0), 
-			card("spades", "K", "black", 0, 0)
+	Card drawnCard;
+	Deck standardDeck = Deck(
+		vector<Card>{
+			Card("diamonds", "A", "red", 6, 0), Card("diamonds", "2", "red", 0, 0), Card("diamonds", "3", "red", 0, 0), Card("diamonds", "4", "red", 0, 0),
+			Card("diamonds", "5", "red", 0, 0), Card("diamonds", "6", "red", 0, 0), Card("diamonds", "7", "red", 0, 0), Card("diamonds", "8", "red", 0, 0), 
+			Card("diamonds", "9", "red", 0, 0), Card("diamonds", "X", "red", 0, 0), Card("diamonds", "J", "red", 0, 0), Card("diamonds", "Q", "red", 0, 0), 
+			Card("diamonds", "K", "red", 0, 0),
+			Card("clubs", "A", "black", 0, 0), Card("clubs", "2", "black", 0, 8), Card("clubs", "3", "black", 0, 0), Card("clubs", "4", "black", 0, 0),
+			Card("clubs", "5", "black", 0, 0), Card("clubs", "6", "black", 0, 0), Card("clubs", "7", "black", 0, 0), Card("clubs", "8", "black", 0, 0), 
+			Card("clubs", "9", "black", 0, 0), Card("clubs", "X", "black", 0, 0), Card("clubs", "J", "black", 0, 0), Card("clubs", "Q", "black", 0, 0), 
+			Card("clubs", "K", "black", 0, 0),
+			Card("hearts", "A", "red", 0, 0), Card("hearts", "2", "red", 0, 0), Card("hearts", "3", "red", 0, 0), Card("hearts", "4", "red", 0, 0),
+			Card("hearts", "5", "red", 0, 0), Card("hearts", "6", "red", 4, 5), Card("hearts", "7", "red", 0, 0), Card("hearts", "8", "red", 0, 0), 
+			Card("hearts", "9", "red", 0, 0), Card("hearts", "X", "red", 0, 0), Card("hearts", "J", "red", 0, 0), Card("hearts", "Q", "red", 0, 0), 
+			Card("hearts", "K", "red", 0, 0),
+			Card("spades", "A", "black", 0, 0), Card("spades", "2", "black", 0, 0), Card("spades", "3", "black", 0, 0), Card("spades", "4", "black", 0, 0), 
+			Card("spades", "5", "black", 0, 0), Card("spades", "6", "black", 0, 0), Card("spades", "7", "black", 0, 0), Card("spades", "8", "black", 0, 0), 
+			Card("spades", "9", "black", 0, 0), Card("spades", "X", "black", 0, 0), Card("spades", "J", "black", 0, 0), Card("spades", "Q", "black", 0, 0), 
+			Card("spades", "K", "black", 0, 0)
 	});
-	deck playerHand = deck(vector<card>{});
-	deck dealerHand = deck(vector<card>{});
-	deck ai1Hand = deck(vector<card>{});
-	deck ai2Hand = deck(vector<card>{});
-	deck ai3Hand = deck(vector<card>{});
-	deck ai4Hand = deck(vector<card>{});
+	Deck playerHand = Deck(vector<Card>{});
+	Deck dealerHand = Deck(vector<Card>{});
+	Deck ai1Hand = Deck(vector<Card>{});
+	Deck ai2Hand = Deck(vector<Card>{});
+	Deck ai3Hand = Deck(vector<Card>{});
+	Deck ai4Hand = Deck(vector<Card>{});
+
+	Button testButton = Button(5, 5, "press me", 0);
 	
 	turnOrder = { ai1Hand, ai2Hand, playerHand, ai3Hand, ai4Hand, dealerHand };
 	
-	//preparing the deck on the table
+	//preparing the Deck on the table
 	standardDeck.shuffle();
 	standardDeck.hideAll();
 	standardDeck.flipSpecific(0, true);
@@ -130,6 +133,8 @@ int main() {
 		cout << "Total: " << ai4Hand.blackJackValue("string");
 		gf::coords(scoreCoords[5][0], scoreCoords[5][1]);
 		cout << "Total: " << dealerHand.blackJackValue("string");
+			//buttons
+		testButton.render();
 
 		switch (whoseTurn) {
 		case 0: //first ai

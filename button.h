@@ -1,8 +1,8 @@
-#include "globalFunctions.h"
+#include "GlobalFunctions.h"
 #include <string>
 using namespace std;
 #pragma once
-class button
+class Button
 {
 private:
 	int x;
@@ -12,8 +12,8 @@ private:
 
 public:
 	
-	button(int x, int y, string text, int function);
+	Button(int x, int y, string text, int function);
 
-	void draw();
+	void render();
 };
 

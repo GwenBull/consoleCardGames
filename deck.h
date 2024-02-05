@@ -3,21 +3,21 @@
 using namespace std;
 #pragma once
 
-class deck //This class is used for any group of cards, including what you would expect the deck to be or a player's hand
+class Deck //This class is used for any group of cards, including what you would expect the deck to be or a player's hand
 {
 private:
-	vector<card> cards;
+	vector<Card> cards;
 
 public:
-	deck(vector<card> cards);
+	Deck(vector<Card> cards);
 
 	void shuffle();
 
-	vector<card> getCards();
+	vector<Card> getCards();
 
-	card drawTopCard();
+	Card drawTopCard();
 
-	void placeCardAtTop(card newCard);
+	void placeCardAtTop(Card newCard);
 
 	void showAll();
 

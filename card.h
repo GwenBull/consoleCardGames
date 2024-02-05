@@ -1,8 +1,8 @@
-#include "globalFunctions.h"
+#include "GlobalFunctions.h"
 using namespace std;
 #pragma once
 
-class card
+class Card
 {
 private:
 	string house;
@@ -14,9 +14,9 @@ private:
 
 public:
 
-	card();
+	Card();
 
-	card(string house, string value, string colour, int xPos, int yPos);
+	Card(string house, string value, string colour, int xPos, int yPos);
 
 	string getHouse();
 
