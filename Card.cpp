@@ -3,7 +3,11 @@
 using namespace std;
 using namespace gf;
 
-Card::Card() {} //default constructor
+Card::Card() {
+	this->xPos = 0;
+	this->yPos = 0;
+	this->isFaceUp = false;
+} //default constructor
 
 Card::Card(string house, string value, string colour, int xPos, int yPos) {
 	this->house = house;

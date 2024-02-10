@@ -9,6 +9,8 @@ private:
 	vector<Card> cards;
 
 public:
+	Deck();
+
 	Deck(vector<Card> cards);
 
 	void shuffle();

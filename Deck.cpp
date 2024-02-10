@@ -2,6 +2,10 @@
 #include "GlobalFunctions.h"
 using namespace std;
 
+Deck::Deck() {
+	this->cards = {};
+}
+
 Deck::Deck(vector<Card> cards) {
 	this->cards = cards;
 }
@@ -68,7 +72,8 @@ void Deck::spreadHoriz(int x, int y) {
 	}
 }
 
-string Deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack
+string Deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack and returns it with some visual data attached
+											  //simplifies the function calls that need to be made when displaying opponents to the player
 	int value = 0;
 	int aces = 0;
 	int unknowns = 0;
@@ -128,7 +133,7 @@ string Deck::blackJackValue(string display) { //calculates a hand's value in a g
 	return returnVal;
 }
 
-int Deck::blackJackValue(int raw) { //calculates a hand's value in a game of blackjack
+int Deck::blackJackValue(int display) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
 	for (int i = 0; i < this->cards.size(); i++) {

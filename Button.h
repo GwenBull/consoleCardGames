@@ -15,5 +15,13 @@ public:
 	Button(int x, int y, string text, int function);
 
 	void render();
+
+	int getX();
+
+	int getY();
+
+	string getText();
+
+	int getFunctionID();
 };
 
