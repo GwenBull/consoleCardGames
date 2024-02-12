@@ -10,10 +10,10 @@ using namespace gf;
 int whiteText = 7;
 int whoseTurn = 0;
 
-vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 30}, {100, 20}, {125, 10}, {75, 0} };
-vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 31}, {100, 21}, {125, 11}, {75, 1} };
+vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 29}, {100, 20}, {125, 10}, {75, 0} };
+vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 30}, {100, 21}, {125, 11}, {75, 1} };
 vector<Deck*> turnOrder;
-vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 35}, {100, 25}, {125, 15}, {75, 5} };
+vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 34}, {100, 25}, {125, 15}, {75, 5} };
 
 Card drawnCard;
 Deck standardDeck;
@@ -103,27 +103,58 @@ int buttonPress(int function) {
 		drawnCard = standardDeck.drawTopCard();
 		drawnCard.flip();
 		playerHand.placeCardAtTop(drawnCard);
+		return 1;
 		break;
 	case 4: //"stand" in blackjack
 		whoseTurn++;
+		return 1;
 		break;
 	case 5:
-		if (handCopy.size() == 2 && handCopy[0].getValue() == handCopy[1].getValue()) {
+		if (handCopy.size() == 2 && values[handCopy[0].getValue()] == values[handCopy[1].getValue()]) {
 			playerHand.drawTopCard();
 			drawnCard = standardDeck.drawTopCard();
 			drawnCard.flip();
 			playerHand.placeCardAtTop(drawnCard);
+			return 1;
 		}
 		else {
 			cout << "\a";
+			return 0;
 		}
+		return 0;
 		break;
 	case 6:
 		gamemode = 0;
+		return 1;
+		break;
 	default:
+		return 0;
 		break;
 	}
 	return 0;
+}
+
+void aiTurn(int whichPlayer, int softLimit) {
+	int currentTotal = turnOrder[whichPlayer]->blackJackValue(1);
+	if (currentTotal < softLimit) {
+		drawnCard = standardDeck.drawTopCard();
+		drawnCard.flip();
+		turnOrder[whichPlayer]->placeCardAtTop(drawnCard);
+		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
+		cout << "Hit";
+	}
+	else if (currentTotal <= 21) {
+		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
+		cout << "Stand";
+		whoseTurn++;
+	}
+	else {
+		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
+		turnOrder[whichPlayer]->showAll();
+		cout << "Bust";
+		whoseTurn++;
+	}
+
 }
 
 int main() {
@@ -155,6 +186,8 @@ int main() {
 		case 0: //shows the main menu
 			currentUI.copyButtons(&mainMenu);
 			drawBigSpade();
+			coords(0, 44);
+			cout << "Use the arrow keys to move, use enter to select";
 			break;
 		case 1:
 			//preparing the Deck on the table
@@ -174,124 +207,34 @@ int main() {
 			firstDeal(&standardDeck, &dealerHand, &playerHand, &ai1Hand, &ai2Hand, &ai3Hand, &ai4Hand); //deals 2 cards to each player
 			turnOrder = { &ai1Hand, &ai2Hand, &playerHand, &ai3Hand, &ai4Hand, &dealerHand }; //defines the turn order
 			gamemode = 2;
+			whoseTurn = 0;
 			currentUI.copyButtons(&blankMenu);
-			whoseTurn = 1;
 			break;
 		case 2:
 			SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 			switch (whoseTurn) {
 			case 0: //first ai
 				currentUI.copyButtons(&blankMenu);
-				currentTotal = ai1Hand.blackJackValue(1);
-				if (currentTotal < 16) {
-					drawnCard = standardDeck.drawTopCard();
-					drawnCard.flip();
-					ai1Hand.placeCardAtTop(drawnCard);
-					gf::coords(talkCoords[0][0], talkCoords[0][1]);
-					cout << "Hit";
-				}
-				else if (currentTotal <= 21) {
-					gf::coords(talkCoords[0][0], talkCoords[0][1]);
-					cout << "Stand";
-					whoseTurn++;
-				}
-				else {
-					gf::coords(talkCoords[0][0], talkCoords[0][1]);
-					ai1Hand.showAll();
-					cout << "Bust";
-					whoseTurn++;
-				}
+				aiTurn(0, 16);
 				break;
 			case 1: //second ai
 				currentUI.copyButtons(&blankMenu);
-				currentTotal = ai2Hand.blackJackValue(1);
-				if (currentTotal < 21) {
-					drawnCard = standardDeck.drawTopCard();
-					drawnCard.flip();
-					ai2Hand.placeCardAtTop(drawnCard);
-					gf::coords(talkCoords[1][0], talkCoords[1][1]);
-					cout << "Hit";
-				}
-				else if (currentTotal <= 21) {
-					gf::coords(talkCoords[1][0], talkCoords[1][1]);
-					cout << "Stand";
-					whoseTurn++;
-				}
-				else {
-					gf::coords(talkCoords[1][0], talkCoords[1][1]);
-					ai2Hand.showAll();
-					cout << "Bust";
-					whoseTurn++;
-				}
+				aiTurn(1, 20);
 				break;
 			case 2:
 				currentUI.copyButtons(&blackJackMenu);
 				break;
 			case 3: //third ai (after the player)
 				currentUI.copyButtons(&blankMenu);
-				currentTotal = ai3Hand.blackJackValue(1);
-				if (currentTotal < 17) {
-					drawnCard = standardDeck.drawTopCard();
-					drawnCard.flip();
-					ai3Hand.placeCardAtTop(drawnCard);
-					gf::coords(talkCoords[3][0], talkCoords[3][1]);
-					cout << "Hit";
-				}
-				else if (currentTotal <= 21) {
-					gf::coords(talkCoords[3][0], talkCoords[3][1]);
-					cout << "Stand";
-					whoseTurn++;
-				}
-				else {
-					gf::coords(talkCoords[3][0], talkCoords[3][1]);
-					ai3Hand.showAll();
-					cout << "Bust";
-					whoseTurn++;
-				}
+				aiTurn(3, 17);
 				break;
 			case 4: //fourth ai
 				currentUI.copyButtons(&blankMenu);
-				currentTotal = ai4Hand.blackJackValue(1);
-				if (currentTotal < 17) {
-					drawnCard = standardDeck.drawTopCard();
-					drawnCard.flip();
-					ai4Hand.placeCardAtTop(drawnCard);
-					gf::coords(talkCoords[4][0], talkCoords[4][1]);
-					cout << "Hit";
-				}
-				else if (currentTotal <= 21) {
-					gf::coords(talkCoords[4][0], talkCoords[4][1]);
-					cout << "Stand";
-					whoseTurn++;
-				}
-				else {
-					gf::coords(talkCoords[4][0], talkCoords[4][1]);
-					ai4Hand.showAll();
-					cout << "Bust";
-					whoseTurn++;
-				}
+				aiTurn(4, 15);
 				break;
 			case 5: //fifth ai (dealer)
 				currentUI.copyButtons(&blankMenu);
-				currentTotal = dealerHand.blackJackValue(1);
-				if (currentTotal < 17) {
-					drawnCard = standardDeck.drawTopCard();
-					drawnCard.flip();
-					dealerHand.placeCardAtTop(drawnCard);
-					gf::coords(talkCoords[5][0], talkCoords[5][1]);
-					cout << "Hit";
-				}
-				else if (currentTotal <= 21) {
-					gf::coords(talkCoords[5][0], talkCoords[5][1]);
-					cout << "Stand";
-					whoseTurn++;
-				}
-				else {
-					gf::coords(talkCoords[5][0], talkCoords[5][1]);
-					dealerHand.showAll();
-					cout << "Bust";
-					whoseTurn++;
-				}
+				aiTurn(5, 16);
 				break;
 			case 6:
 				currentUI.copyButtons(&postBlackJackMenu);
@@ -308,7 +251,7 @@ int main() {
 
 					}
 				}
-				if (dealerHand.blackJackValue(1) == 21) {
+				if (dealerHand.blackJackValue(1) <= 21 && dealerHand.blackJackValue(1) >= playerHand.blackJackValue(1)) {
 					playerCanWin = false;
 				}
 				coords(75, 25);
@@ -318,11 +261,12 @@ int main() {
 				else {
 					cout << "You lose!";
 				}
+				coords(75, 26);
+				cout << "Play again?";
 			}
 			//rendering
-			coords(0, 0);
+			coords(1, 0);
 			cout << "Deck";
-			cout << currentUI.getCurrentlySelected().getText();
 				//cards
 			standardDeck.renderAll();
 			ai1Hand.spreadHoriz(handCoords[0][0], handCoords[0][1]);
