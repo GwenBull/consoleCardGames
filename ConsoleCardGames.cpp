@@ -42,7 +42,7 @@ Deck resetDeck = Deck( //A full deck of cards used to reset other decks
 		Card("spades", "5", "black", 0, 0), Card("spades", "6", "black", 0, 0), Card("spades", "7", "black", 0, 0), Card("spades", "8", "black", 0, 0),
 		Card("spades", "9", "black", 0, 0), Card("spades", "X", "black", 0, 0), Card("spades", "J", "black", 0, 0), Card("spades", "Q", "black", 0, 0),
 		Card("spades", "K", "black", 0, 0)
-});
+}); //I don't care. This works
 
 void init() {
 	CONSOLE_FONT_INFOEX cfi;
@@ -65,7 +65,7 @@ void firstDeal(Deck* mainPile, Deck* dealer, Deck* player, Deck* ai1, Deck* ai2,
 	vector<Deck*> dealOrder = { ai1, ai2, player, ai3, ai4, dealer };
 	for (int i = 0; i < 2; i++) { //for the 2 initial cards per player
 		for (int j = 0; j < 6; j++) { //for each player + dealer
-			Sleep(104); //wait a reasonable time
+			Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a Card
 			if (j == 2 || (j == 5 && i == 1)) { //if it's the player's Card or the dealers last Card
 				drawnCard.flip(); //make it visible
@@ -186,7 +186,7 @@ int main() {
 		case 0: //shows the main menu
 			currentUI.copyButtons(&mainMenu);
 			drawBigSpade();
-			coords(0, 44);
+			coords(0, 42);
 			cout << "Use the arrow keys to move, use enter to select";
 			break;
 		case 1:
