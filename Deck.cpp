@@ -44,9 +44,9 @@ void Deck::showAll() {
 	}
 }
 
-void Deck::hideAll() {
+void Deck::hideAll() { //sets every Card in this Deck to face down
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setFace(false); //sets every Card in this Deck to face down
+		this->cards[i].setFace(false);
 	}
 }
 
@@ -54,21 +54,21 @@ void Deck::flipSpecific(int which, bool face) {
 	this->cards[which].setFace(face);
 }
 
-void Deck::stack(int x, int y) {
+void Deck::stack(int x, int y) { //places this entire Deck at the specified position
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y); //places this entire Deck at the specified position
+		this->cards[i].setPos(x, y);
 	}
 }
 
-void Deck::spreadVert(int x, int y) {
+void Deck::spreadVert(int x, int y) { //distributes the Deck vertically from a specified position
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y + (i * 2)); //distributes the Deck vertically from a specified position
+		this->cards[i].setPos(x, y + (i * 2));
 	}
 }
 
-void Deck::spreadHoriz(int x, int y) {
+void Deck::spreadHoriz(int x, int y) { //distributes the Deck horizontally from a specified position
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x + (i * 3), y); //distributes the Deck horizontally from a specified position
+		this->cards[i].setPos(x + (i * 3), y);
 	}
 }
 
@@ -136,6 +136,8 @@ string Deck::blackJackValue(string display) { //calculates a hand's value in a g
 int Deck::blackJackValue(int display) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
+	//It has to do a load of ifs because card.value is a string, and they need to be added as ints, not concatenated
+	//And they have to be strings because some have a letter as their value
 	for (int i = 0; i < this->cards.size(); i++) {
 		if (this->cards[i].getValue() == "A") {
 			value += 11;
