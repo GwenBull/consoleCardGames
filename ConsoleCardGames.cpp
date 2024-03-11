@@ -6,7 +6,6 @@ using namespace gf;
 
 //Global variables
 //Window control
-//
 int whiteText = 7;
 int whoseTurn = 0;
 
@@ -16,7 +15,7 @@ vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 30}, {100, 21}, {125
 vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 34}, {100, 25}, {125, 15}, {75, 5} };
 vector<Deck*> turnOrder;
 //solitaire coordinates of various things
-vector<vector<int>> stackCoords = { {7, 1}, {14, 1}, {21, 1}, {28, 1}, {35, 1}, {42, 1}, {49, 1} };
+vector<vector<int>> stackCoords = { {14, 1}, {21, 1}, {28, 1}, {35, 1}, {42, 1}, {49, 1}, {56, 1} };
 vector<vector<int>> sortCoords = {};
 
 Deck resetDeck = Deck( //A full deck of cards used to reset other decks
@@ -62,6 +61,8 @@ Deck clubs;
 Deck hearts;
 Deck spades;
 
+UserInterface currentUI;
+
 void init() {
 	CONSOLE_FONT_INFOEX cfi;
 	cfi.cbSize = sizeof(cfi);
@@ -75,6 +76,11 @@ void init() {
 	GetWindowRect(console, &r);
 	MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //makes the window 720p (the drawable dimensions are 154 by 40 ish)
 	//Numbers slightly off because things I don't understand make it not exactly the written numbers
+	//for (int i = 0; i < 256; i++) {
+	//	SetConsoleTextAttribute(hConsole, i);
+	//	cout << i << ": " << char(i) << "\n";
+	//}
+	//_getch();
 	clearScreen();
 }
 
@@ -98,15 +104,17 @@ void firstDeal(Deck* mainPile, Deck* dealer, Deck* player, Deck* ai1, Deck* ai2,
 void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck* s4, Deck* s5, Deck* s6) {
 	Card drawnCard;
 	vector<Deck*> dealOrder = { s0, s1, s2, s3, s4, s5, s6 };
-	for (int i = 0; i < 7; i++) {
-		for (int j = i; j < 7; j++) {
-			//cout << i << ", " << j;
-			drawnCard = mainPile->drawTopCard();
-			dealOrder[j]->placeCardAtTop(drawnCard);
+	for (int i = 0; i < 7; i++) { //for the 7 initital stacks
+		for (int j = i; j < 7; j++) { //for the (up to) 7 cards per stack
+			Sleep(208); //wait a reasonable time
+			drawnCard = mainPile->drawTopCard(); //draw a card
+			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
+			dealOrder[j]->spreadVert(stackCoords[j][0], stackCoords[j][1]); //place the stack at the right place
+			if (i == j) { //if dealt to the top of a stack
+				dealOrder[j]->flipSpecific(dealOrder[j]->getCards().size() - 1, true); //flip over
+			}
+			dealOrder[j]->renderAll(); //draw each stack
 		}
-		dealOrder[i]->flipSpecific(dealOrder[i]->getCards().size() - 1, true);
-		dealOrder[i]->spreadVert(stackCoords[i][0], stackCoords[i][1]);
-		dealOrder[i]->renderAll();
 	}
 }
 
@@ -117,9 +125,11 @@ int buttonPress(int function) {
 	//but not all button functions will need the same parameters, so that would be a very messy function, and it leads to confusing or circular includes because of custom objects
 	//Probably didn't need explaining but oh well
 	vector<Card> handCopy = playerHand.getCards();
+	vector<Deck*> stacks = { &standardDeck, &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
+	Card drawnCard;
 	switch (function) {
 	case -1: //do nothing
-		break;
+		return 1;
 	case 0: //enter the blackjack setup scene
 		standardDeck = resetDeck;
 		gamemode = 1;
@@ -130,17 +140,14 @@ int buttonPress(int function) {
 	case 2: //exit the game
 		gamemode = 5;
 		return 1;
-	case 3: //"hit" in blackjack
+	case 3: //"hit" in blackjack and picking up the top unstacked/unsorted card in patience 
 		if (standardDeck.getCards().size() > 1) {
 			drawnCard = standardDeck.drawTopCard();
-			drawnCard.flip();
+			drawnCard.setFace(true);
 			playerHand.placeCardAtTop(drawnCard);
 			return 1;
 		}
-		else { //if there's nop more cards to pull
-			cout << "\a";
-		}
-		return 0;
+		break;
 	case 4: //"stand" in blackjack
 		whoseTurn++;
 		return 1;
@@ -152,10 +159,6 @@ int buttonPress(int function) {
 			playerHand.placeCardAtTop(drawnCard);
 			return 1;
 		}
-		else { //splitting isn't possible
-			cout << "\a";
-		}
-		return 0;
 		break;
 	case 6: // return to menu
 		gamemode = 0;
@@ -167,10 +170,29 @@ int buttonPress(int function) {
 			return 0;
 		}
 		return 1;
+	case 8: //takes a single card in patience (specifically for patience because there's different logic needed than the blackjack draw
+		if (standardDeck.getCards().size() >= 1) {
+			drawnCard = standardDeck.drawTopCard();
+			drawnCard.setFace(true);
+			playerHand.placeCardAtTop(drawnCard);
+			return 1;
+		}
+		break;
+	case 9: //takes every face-up card from a specific patience stack
+		break;
+	case 10: //places your hand at the targeted stack
+		playerHand.reverseCards(); //reverses the order of the held cards for ease of iteration
+		for (int i = 0; i < playerHand.getCards().size(); i++) {
+			drawnCard = playerHand.drawTopCard(); //take the next to be placed
+			stacks[currentUI.getSelectionVal()[0]]->placeCardAtTop(drawnCard); //and place it in the stack above the pressed button
+			return 1;
+		}
+		break;
 	default: //unregistered button
-		return 0;
+		break;
 	}
-	return 0; //something's gone seriously wrong if you've got here
+	cout << "\a"; //if a function has got this far, it has not been able to complete it's intended function
+	return 0; //return a 0; I'll likely never read the return values from this function but it is useful just in case
 }
 
 void aiTurn(int whichPlayer, int softLimit) {
@@ -209,16 +231,38 @@ int main() {
 	Button turnButton = Button(85, 37, "Next", -1);
 	Button keepPlaying = Button(65, 37, "Yes", 7);
 	Button returnToMenu = Button(85, 37, "No", 6);
+	///solitaire in-game
+	////solitaire take
+	Button drawMore = Button(1, 5, "Draw", 8);
+	Button takeFromDeck = Button(1, 28, "Take", 9);
+	Button takeS0 = Button(14, 28, "Take", 12);
+	Button takeS1 = Button(21, 28, "Take", 12);
+	Button takeS2 = Button(28, 28, "Take", 12);
+	Button takeS3 = Button(35, 28, "Take", 12);
+	Button takeS4 = Button(42, 28, "Take", 12);
+	Button takeS5 = Button(49, 28, "Take", 12);
+	Button takeS6 = Button(56, 28, "Take", 12);
+	////solitaire place
+	Button placeDeck = Button(1, 28, "Deck", 10);
+	Button placeS0 = Button(14, 28, "  1  ", 10);
+	Button placeS1 = Button(21, 28, "  2  ", 10);
+	Button placeS2 = Button(28, 28, "  3  ", 10);
+	Button placeS3 = Button(35, 28, "  4  ", 10);
+	Button placeS4 = Button(42, 28, "  5  ", 10);
+	Button placeS5 = Button(49, 28, "  6  ", 10);
+	Button placeS6 = Button(56, 28, "  7  ", 10);
+	Button placeSort = Button(63, 28, "Sort", 11);
 	//UIs
 	UserInterface mainMenu = UserInterface(vector<vector<Button>>{ { buttonBlackJack }, { buttonSolitaire }, { exitGame } });
 	UserInterface blackJackMenu = UserInterface(vector<vector<Button>>{{hitButton, standButton, splitButton}});
 	UserInterface blankMenu = UserInterface(vector<vector<Button>>{{turnButton}});
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
+	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, {takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6}});
+	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeDeck, placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6}});
 	int currentTotal;
 	init();
 
-	UserInterface currentUI;
-	
+	vector<Deck*> dealOrder = { &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6};
 
 	while (true){ //main game loop
 		switch (gf::gamemode) {
@@ -305,7 +349,7 @@ int main() {
 			//rendering
 			coords(1, 0);
 			cout << "Deck";
-				//cards
+			//cards
 			standardDeck.renderAll();
 			ai1Hand.spreadHoriz(handCoords[0][0], handCoords[0][1]);
 			ai1Hand.renderAll();
@@ -357,8 +401,50 @@ int main() {
 			standardDeck.flipSpecific(0, true); //puts the last card face up
 			standardDeck.stack(1, 1); //puts the deck in the top left corner
 			solitaireSetup(&standardDeck, &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6);
+			gamemode = 4;
+			currentUI.copyButtons(&solitaireTakeMenu);
+			standardDeck.renderAll();
 			break;
 		case 4: //patience gameloop
+			if (playerHand.getCards().size() == 0) { //decide ui
+				currentUI.copyButtons(&solitaireTakeMenu);
+			}
+			else {
+				currentUI.copyButtons(&solitairePlaceMenu);
+			}
+
+			playerHand.spreadVert(70, 1);
+			for (int i = 0; i < 7; i++) { //organise cards
+				if (dealOrder[i]->getCards().size() > 12) {
+					dealOrder[i]->spreadVertCompressed(stackCoords[i][0], stackCoords[i][1]);
+				}
+				else {
+					dealOrder[i]->spreadVert(stackCoords[i][0], stackCoords[i][1]);
+				}
+			}
+			//Rendering
+			coords(1, 0);
+			cout << "Deck";
+			coords(63, 0);
+			cout << "Sort";
+			coords(70, 0);
+			cout << "Held";
+			//fake cards
+			Card("diamonds", " ", "dGrey", 63, 1).render();
+			Card("clubs", " ", "lGrey", 63, 7).render();
+			Card("hearts", " ", "dGrey", 63, 13).render();
+			Card("spades", " ", "lGrey", 63, 19).render();
+			//cards
+			standardDeck.renderAll();
+			stack0.renderAll();
+			stack1.renderAll();
+			stack2.renderAll();
+			stack3.renderAll();
+			stack4.renderAll();
+			stack5.renderAll();
+			stack6.renderAll();
+			playerHand.renderAll();
+
 			break;
 		case 5: //quit game
 			return 1;
@@ -394,6 +480,8 @@ int main() {
 				break;
 			}
 		}
+		GetWindowRect(console, &r);
+		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //makes the window 720p (the drawable dimensions are 154 by 40 ish)
 		clearScreen();
 	}
 	return 1;

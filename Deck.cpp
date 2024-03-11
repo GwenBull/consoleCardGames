@@ -66,6 +66,12 @@ void Deck::spreadVert(int x, int y) { //distributes the Deck vertically from a s
 	}
 }
 
+void Deck::spreadVertCompressed(int x, int y) { //distributes the Deck vertically from a specified position
+	for (int i = 0; i < this->cards.size(); i++) {
+		this->cards[i].setPos(x, y + i);
+	}
+}
+
 void Deck::spreadHoriz(int x, int y) { //distributes the Deck horizontally from a specified position
 	for (int i = 0; i < this->cards.size(); i++) {
 		this->cards[i].setPos(x + (i * 3), y);
@@ -182,4 +188,9 @@ void Deck::renderAll() {
 	for (int i = 0; i < this->getCards().size(); i++) { //get every Card in the Deck
 		this->getCards()[i].render(); //and render it
 	}
+}
+
+void Deck::reverseCards() {
+	reverse(this->cards.begin(), this->cards.end());
+
 }

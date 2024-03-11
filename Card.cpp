@@ -26,6 +26,10 @@ string Card::getValue() {
 	return this->value;
 }
 
+string Card::getColour() {
+	return this->colour;
+}
+
 int Card::getX() {
 	return this->xPos;
 }
@@ -74,4 +78,11 @@ void Card::render() {
 		gf::coords(this->xPos, this->yPos + 3);
 		cout << "\u00C8\u00CD\u00CD\u00CD\u00BC";
 	}
+}
+
+string Card::evaluateCard(Card* compCard) {
+	if (compCard->getValue() == this->value && compCard->getHouse() == this->house && compCard->getColour() == this->colour) {
+		return "VH";
+	}
+	else if (compCard->getValue() == this->value && compCard->getHouse() == this->house) {}
 }

@@ -77,6 +77,10 @@ Button UserInterface::getCurrentlySelected() {
 	return buttons[selected[1]][selected[0]];
 }
 
+vector<int> UserInterface::getSelectionVal() {
+	return this->selected;
+}
+
 void UserInterface::copyButtons(UserInterface* buttonSet) { //takes the buttons from another ui and copies them into this
 	this->buttons = buttonSet->buttons; //clones the buttons
 	if (this->selected[1] >= this->buttons.size()) { //checks if the cursor is now OOB

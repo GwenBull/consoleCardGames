@@ -31,6 +31,8 @@ public:
 
 	void spreadVert(int x, int y);
 
+	void spreadVertCompressed(int x, int y);
+
 	void spreadHoriz(int x, int y);
 
 	string blackJackValue(string display);
@@ -38,4 +40,6 @@ public:
 	int blackJackValue(int raw);
 
 	void renderAll();
+
+	void reverseCards();
 };

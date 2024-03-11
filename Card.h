@@ -21,6 +21,8 @@ public:
 	string getHouse();
 
 	string getValue();
+	
+	string getColour();
 
 	int getX();
 
@@ -35,4 +37,6 @@ public:
 	void setFace(bool faceUp);
 
 	void render();
+
+	string evaluateCard(Card* otherCard);
 };

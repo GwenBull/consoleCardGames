@@ -28,6 +28,8 @@ public:
 
 	Button getCurrentlySelected();
 
+	vector<int> getSelectionVal();
+
 	void copyButtons(UserInterface* buttonSet);
 };
 
