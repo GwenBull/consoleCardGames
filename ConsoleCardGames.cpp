@@ -6,6 +6,7 @@ using namespace gf;
 
 //Global variables
 //Window control
+
 int whiteText = 7;
 int whoseTurn = 0;
 
@@ -233,7 +234,7 @@ int main() {
 	Button returnToMenu = Button(85, 37, "No", 6);
 	///solitaire in-game
 	////solitaire take
-	Button drawMore = Button(1, 5, "Draw", 8);
+	Button drawMore = Button(1, 25, "Draw", 8);
 	Button takeFromDeck = Button(1, 28, "Take", 9);
 	Button takeS0 = Button(14, 28, "Take", 12);
 	Button takeS1 = Button(21, 28, "Take", 12);
@@ -265,6 +266,7 @@ int main() {
 	vector<Deck*> dealOrder = { &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6};
 
 	while (true){ //main game loop
+		gameLoop:
 		switch (gf::gamemode) {
 		case 0: //shows the main menu
 			currentUI.copyButtons(&mainMenu);
@@ -289,12 +291,15 @@ int main() {
 			firstDeal(&standardDeck, &dealerHand, &playerHand, &ai1Hand, &ai2Hand, &ai3Hand, &ai4Hand); //deals 2 cards to each player
 			turnOrder = { &ai1Hand, &ai2Hand, &playerHand, &ai3Hand, &ai4Hand, &dealerHand }; //defines the turn order
 			gamemode = 2;
-			whoseTurn = 0;
+			whoseTurn = -1;
 			currentUI.copyButtons(&blankMenu);
-			break;
+			continue; //resets the game loop so that everything renders properly on the first loop of blackjack
 		case 2: //blackjack gameloop
 			SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 			switch (whoseTurn) {
+			case -1:
+				whoseTurn++; //gives a single cycle of "wait time" so the player doesn't miss anything
+				break;
 			case 0: //first ai
 				currentUI.copyButtons(&blankMenu);
 				aiTurn(0, 16);
@@ -404,6 +409,7 @@ int main() {
 			gamemode = 4;
 			currentUI.copyButtons(&solitaireTakeMenu);
 			standardDeck.renderAll();
+			continue; //makes everything render properly for the first loop of patience
 			break;
 		case 4: //patience gameloop
 			if (playerHand.getCards().size() == 0) { //decide ui
@@ -481,8 +487,9 @@ int main() {
 			}
 		}
 		GetWindowRect(console, &r);
-		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //makes the window 720p (the drawable dimensions are 154 by 40 ish)
+		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
 		clearScreen();
+		continue;
 	}
 	return 1;
 }
