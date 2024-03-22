@@ -91,6 +91,40 @@ bool aiTurn(int whichPlayer, int softLimit, Deck* standardDeck, vector<Deck*> tu
 	return false;
 }
 
+int readInput(UserInterface* currentUI) {
+	int function = -1;
+	int ch = _getch();
+	if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first, useless one
+		ch = _getch(); //then gets the real arrow value
+		switch (ch) { //this switch is nested here so it will only respond to presses of the arrow keys
+		case 72: //up arrow
+			currentUI->selectionMoveUp();
+			break;
+		case 80: //down arrow
+			currentUI->selectionMoveDown();
+			break;
+		case 75: //left arrow
+			currentUI->selectionMoveLeft();
+			break;
+		case 77: //right arrow
+			currentUI->selectionMoveRight();
+			break;
+		default:
+			break;
+		}
+	}
+	else { //this switch responds to everything else
+		switch (ch) {
+		case 13: //enter
+			function = currentUI->getCurrentlySelected().getFunctionID(); //triggers the specfic function for whichever button is selected
+			break;
+		default:
+			break;
+		}
+	}
+	return function;
+}
+
 int main() {
 	int function = 0;
 	//Global variables
@@ -141,6 +175,7 @@ int main() {
 	Deck clubs;
 	Deck hearts;
 	Deck spades;
+	Deck tempHand;
 
 	//Buttons
 	///mainMenu
@@ -165,6 +200,9 @@ int main() {
 	Button takeS4 = Button(42, 23, "Take", "takeFromStack");
 	Button takeS5 = Button(49, 23, "Take", "takeFromStack");
 	Button takeS6 = Button(56, 23, "Take", "takeFromStack");
+	////take pt2
+	Button takeOne = Button(28, 26, "Take one", "stackTakeOne");
+	Button takeAll = Button(42, 26, "Take all", "stackTakeAll");
 	////solitaire place
 	Button placeS0 = Button(14, 23, " 1 ", "placeOnStack");
 	Button placeS1 = Button(21, 23, " 2 ", "placeOnStack");
@@ -174,13 +212,15 @@ int main() {
 	Button placeS5 = Button(49, 23, " 6 ", "placeOnStack");
 	Button placeS6 = Button(56, 23, " 7 ", "placeOnStack");
 	Button placeSort = Button(63, 23, "Sort", "placeOnSorted");
+	Button placeUndo = Button(70, 23, "Put back", "undo");
 	//UIs
 	UserInterface mainMenu = UserInterface(vector<vector<Button>>{ { buttonBlackJack }, { buttonSolitaire }, { exitGame } });
 	UserInterface blackJackMenu = UserInterface(vector<vector<Button>>{{hitButton, standButton, splitButton}});
 	UserInterface blankMenu = UserInterface(vector<vector<Button>>{{turnButton}});
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
 	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, {takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6}});
-	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6}});
+	UserInterface solitaireTakeOptions = UserInterface(vector<vector<Button>>{{takeOne, takeAll}});
+	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6, placeUndo}});
 	UserInterface currentUI; //the UI that holds a copy of whichever of the above is currently in use
 	init();
 
@@ -344,8 +384,8 @@ int main() {
 			gamemode = 4;
 			currentUI.copyButtons(&solitaireTakeMenu);
 			standardDeck.renderAll();
+			SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 			continue; //makes everything render properly for the first loop of solitaire
-			break;
 		case 4: //solitaire gameloop
 			if (playerHand.getCards().size() == 0) { //decide ui
 				currentUI.copyButtons(&solitaireTakeMenu);
@@ -394,56 +434,27 @@ int main() {
 		}
 		currentUI.renderUI();
 		//input processing
-		int ch = _getch(); //gets the latest keyboard input
-		function = -1;
-		if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first, useless one
-			ch = _getch(); //then gets the real arrow value
-			switch (ch) { //this switch is nested here so it will only respond to presses of the arrow keys
-			case 72: //up arrow
-				currentUI.selectionMoveUp();
-				break;
-			case 80: //down arrow
-				currentUI.selectionMoveDown();
-				break;
-			case 75: //left arrow
-				currentUI.selectionMoveLeft();
-				break;
-			case 77: //right arrow
-				currentUI.selectionMoveRight();
-				break;
-			default:
-				break;
-			}
-		}
-		else { //this switch responds to everything else
-			switch (ch) {
-			case 13: //enter
-				function = currentUI.getCurrentlySelected().getFunctionID(); //triggers the specfic function for whichever button is selected
-				break;
-			default:
-				break;
-			}
-		}
+		function = readInput(&currentUI);
 
 		//when enter key is registered above, the function var is set to which
-		Card drawnCard;
+		buttonFunctions:
 		switch (function) {
-		case -1: //do nothing
+		case 0: //do nothing
 			break;
-		case 0: //enter the blackjack setup scene
+		case 1: //enter the blackjack setup scene
 			standardDeck = resetDeck;
 			gamemode = 1;
 			break;
-		case 1: //enter the solitaire setup scene
+		case 2: //enter the solitaire setup scene
 			gamemode = 3;
 			break;
-		case 2: // return to menu
+		case 3: // return to menu
 			gamemode = 0;
 			break;
-		case 3: //exit the game
+		case 4: //exit the game
 			gamemode = 5;
 			break;
-		case 4: //"hit" in blackjack and picking up the top unstacked/unsorted card in solitaire 
+		case 5: //"hit" in blackjack and picking up the top unstacked/unsorted card in solitaire 
 			if (standardDeck.getCards().size() > 1) {
 				drawnCard = standardDeck.drawTopCard();
 				drawnCard.setFace(true);
@@ -451,10 +462,10 @@ int main() {
 				break;
 			}
 			break;
-		case 5: //"stand" in blackjack
+		case 6: //"stand" in blackjack
 			whoseTurn++;
 			break;
-		case 6: //"split" in blackjack
+		case 7: //"split" in blackjack
 			if (playerHand.getCards().size() == 2 && values[playerHand.getCards()[0].getValue()] == values[playerHand.getCards()[1].getValue()]) {
 				playerHand.drawTopCard();
 				drawnCard = standardDeck.drawTopCard();
@@ -463,16 +474,28 @@ int main() {
 				break;
 			}
 			break;
-		case 7:
+		case 8:
 			for (int i = 0; i < 3; i++) {
 				drawnCard = standardDeck.drawTopCard();
 				drawnCard.setFace(true);
 				drawnDeck.placeCardAtTop(drawnCard);
 			}
 			break;
-		case 8:
+		case 9:
 			drawnCard = drawnDeck.drawTopCard();
 			playerHand.placeCardAtTop(drawnCard);
+			break;
+		case 10:
+			tempHand = Deck(stacks[currentUI.getSelectionVal()[0]]->getCards());
+			while (true) { //creates a temporary gameloop to allow selection between the "take one" and "take all" without affecting anything that was already on the screen
+				currentUI.copyButtons(&solitaireTakeOptions);
+				rect(28, 26, 52, 3, "whiteText"); //rectangle that covers only these new elements instead of clearing the whole screen
+				currentUI.renderUI(); //draw the UI
+				function = readInput(&currentUI);
+				if (function != -1) { //once an option actually entered,
+					goto buttonFunctions; //takes the function number back to the main game loop
+				}
+			}
 			break;
 		default: //unregistered button
 			break;

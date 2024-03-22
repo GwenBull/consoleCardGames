@@ -27,5 +27,5 @@ string Button::getText() {
 }
 
 int Button::getFunctionID() {
-	return buttonFuncs.find(this->function)->second;
+	return buttonFuncs[this->function];
 }

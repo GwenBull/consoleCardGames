@@ -27,6 +27,7 @@ namespace gf {
     static void coords(int x, int y);
     static void clearScreen();
     static void drawBigSpade();
+    static void rect(int x, int y, int w, int h, string colour);
 }
 
 void gf::coords(int x, int y) {
@@ -124,4 +125,14 @@ void gf::drawBigSpade() { //draws a big spade logo, for the main menu
     coords(60, 31);
     cout << "                        ";
     SetConsoleTextAttribute(hConsole, colours["whiteText"]);
+}
+
+void gf::rect(int x, int y, int w, int h, string colour) {
+    SetConsoleTextAttribute(hConsole, colours[colour]);
+    for (int i = 0; i < h; i++) {
+        coords(x, y + i);
+        for (int j = 0; j < w; j++) {
+            cout << " ";
+        }
+    }
 }
