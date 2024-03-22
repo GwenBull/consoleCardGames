@@ -4,65 +4,14 @@
 using namespace std;
 using namespace gf;
 
-//Global variables
-//Window control
-
-int whiteText = 7;
-int whoseTurn = 0;
-
-//blackJack  Coordinates of various things
-vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 29}, {100, 20}, {125, 10}, {75, 0} };
-vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 30}, {100, 21}, {125, 11}, {75, 1} };
-vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 34}, {100, 25}, {125, 15}, {75, 5} };
-vector<Deck*> turnOrder;
-//solitaire coordinates of various things
-vector<vector<int>> stackCoords = { {14, 1}, {21, 1}, {28, 1}, {35, 1}, {42, 1}, {49, 1}, {56, 1} };
-vector<vector<int>> sortCoords = {};
-
-Deck resetDeck = Deck( //A full deck of cards used to reset other decks
-	vector<Card>{
-	Card("diamonds", "A", "red", 6, 0), Card("diamonds", "2", "red", 0, 0), Card("diamonds", "3", "red", 0, 0), Card("diamonds", "4", "red", 0, 0),
-		Card("diamonds", "5", "red", 0, 0), Card("diamonds", "6", "red", 0, 0), Card("diamonds", "7", "red", 0, 0), Card("diamonds", "8", "red", 0, 0),
-		Card("diamonds", "9", "red", 0, 0), Card("diamonds", "X", "red", 0, 0), Card("diamonds", "J", "red", 0, 0), Card("diamonds", "Q", "red", 0, 0),
-		Card("diamonds", "K", "red", 0, 0),
-		Card("clubs", "A", "black", 0, 0), Card("clubs", "2", "black", 0, 8), Card("clubs", "3", "black", 0, 0), Card("clubs", "4", "black", 0, 0),
-		Card("clubs", "5", "black", 0, 0), Card("clubs", "6", "black", 0, 0), Card("clubs", "7", "black", 0, 0), Card("clubs", "8", "black", 0, 0),
-		Card("clubs", "9", "black", 0, 0), Card("clubs", "X", "black", 0, 0), Card("clubs", "J", "black", 0, 0), Card("clubs", "Q", "black", 0, 0),
-		Card("clubs", "K", "black", 0, 0),
-		Card("hearts", "A", "red", 0, 0), Card("hearts", "2", "red", 0, 0), Card("hearts", "3", "red", 0, 0), Card("hearts", "4", "red", 0, 0),
-		Card("hearts", "5", "red", 0, 0), Card("hearts", "6", "red", 4, 5), Card("hearts", "7", "red", 0, 0), Card("hearts", "8", "red", 0, 0),
-		Card("hearts", "9", "red", 0, 0), Card("hearts", "X", "red", 0, 0), Card("hearts", "J", "red", 0, 0), Card("hearts", "Q", "red", 0, 0),
-		Card("hearts", "K", "red", 0, 0),
-		Card("spades", "A", "black", 0, 0), Card("spades", "2", "black", 0, 0), Card("spades", "3", "black", 0, 0), Card("spades", "4", "black", 0, 0),
-		Card("spades", "5", "black", 0, 0), Card("spades", "6", "black", 0, 0), Card("spades", "7", "black", 0, 0), Card("spades", "8", "black", 0, 0),
-		Card("spades", "9", "black", 0, 0), Card("spades", "X", "black", 0, 0), Card("spades", "J", "black", 0, 0), Card("spades", "Q", "black", 0, 0),
-		Card("spades", "K", "black", 0, 0)
-}); //I don't care. This works
-
-//card vars with names general enough I canuse them across gamemodes
-Card drawnCard;
-Deck standardDeck;
-Deck playerHand;
-//blackjack specific card vars
-Deck dealerHand;
-Deck ai1Hand;
-Deck ai2Hand;
-Deck ai3Hand;
-Deck ai4Hand;
-//patience specific card vars
-Deck stack0;
-Deck stack1;
-Deck stack2;
-Deck stack3;
-Deck stack4;
-Deck stack5;
-Deck stack6;
-Deck diamonds;
-Deck clubs;
-Deck hearts;
-Deck spades;
-
-UserInterface currentUI;
+//Global constants
+///blackJack Coordinates of various things
+const vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 29}, {100, 20}, {125, 10}, {75, 0} }; //the coordinates of each player's text box
+const vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 30}, {100, 21}, {125, 11}, {75, 1} }; //the coordinates of each player's cards
+const vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 34}, {100, 25}, {125, 15}, {75, 5} }; //the coordinates of each player's score display
+///solitaire coordinates of various things
+const vector<vector<int>> stackCoords = { {14, 1}, {21, 1}, {28, 1}, {35, 1}, {42, 1}, {49, 1}, {56, 1} }; //the coordinates of the active play card stacks
+const vector<vector<int>> sortCoords = {}; //the coordinates of where each sorted card suit goes
 
 void init() {
 	CONSOLE_FONT_INFOEX cfi;
@@ -107,7 +56,7 @@ void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck
 	vector<Deck*> dealOrder = { s0, s1, s2, s3, s4, s5, s6 };
 	for (int i = 0; i < 7; i++) { //for the 7 initital stacks
 		for (int j = i; j < 7; j++) { //for the (up to) 7 cards per stack
-			Sleep(208); //wait a reasonable time
+			//Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a card
 			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
 			dealOrder[j]->spreadVert(stackCoords[j][0], stackCoords[j][1]); //place the stack at the right place
@@ -119,154 +68,126 @@ void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck
 	}
 }
 
-int buttonPress(int function) {
-	//a function called to do whatever any UIbutton may want to do
-	//it is in the main file to simplify function parameters
-	//if it were in button.cpp for example, any button affecting a deck would need to be passed in with the function, and potentially passed back on return
-	//but not all button functions will need the same parameters, so that would be a very messy function, and it leads to confusing or circular includes because of custom objects
-	//Probably didn't need explaining but oh well
-	vector<Card> handCopy = playerHand.getCards();
-	vector<Deck*> stacks = { &standardDeck, &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
+bool aiTurn(int whichPlayer, int softLimit, Deck* standardDeck, vector<Deck*> turnOrder) { //returns true or false depending on if the AI took a card
 	Card drawnCard;
-	switch (function) {
-	case -1: //do nothing
-		return 1;
-	case 0: //enter the blackjack setup scene
-		standardDeck = resetDeck;
-		gamemode = 1;
-		return 1;
-	case 1: //enter the solitaire setup scene
-		gamemode = 3;
-		return 1;
-	case 2: //exit the game
-		gamemode = 5;
-		return 1;
-	case 3: //"hit" in blackjack and picking up the top unstacked/unsorted card in patience 
-		if (standardDeck.getCards().size() > 1) {
-			drawnCard = standardDeck.drawTopCard();
-			drawnCard.setFace(true);
-			playerHand.placeCardAtTop(drawnCard);
-			return 1;
-		}
-		break;
-	case 4: //"stand" in blackjack
-		whoseTurn++;
-		return 1;
-	case 5: //"split" in blackjack
-		if (handCopy.size() == 2 && values[handCopy[0].getValue()] == values[handCopy[1].getValue()]) {
-			playerHand.drawTopCard();
-			drawnCard = standardDeck.drawTopCard();
-			drawnCard.flip();
-			playerHand.placeCardAtTop(drawnCard);
-			return 1;
-		}
-		break;
-	case 6: // return to menu
-		gamemode = 0;
-		return 1;
-	case 7: //restarts blackjack without resetting the deck
-		gamemode = 1;	
-		if (standardDeck.getCards().size() < 13) { //unless there's not enough cards to deal the inital hands
-			standardDeck = resetDeck;
-			return 0;
-		}
-		return 1;
-	case 8: //takes a single card in patience (specifically for patience because there's different logic needed than the blackjack draw
-		if (standardDeck.getCards().size() >= 1) {
-			drawnCard = standardDeck.drawTopCard();
-			drawnCard.setFace(true);
-			playerHand.placeCardAtTop(drawnCard);
-			return 1;
-		}
-		break;
-	case 9: //takes every face-up card from a specific patience stack
-		break;
-	case 10: //places your hand at the targeted stack
-		playerHand.reverseCards(); //reverses the order of the held cards for ease of iteration
-		for (int i = 0; i < playerHand.getCards().size(); i++) {
-			drawnCard = playerHand.drawTopCard(); //take the next to be placed
-			stacks[currentUI.getSelectionVal()[0]]->placeCardAtTop(drawnCard); //and place it in the stack above the pressed button
-			return 1;
-		}
-		break;
-	default: //unregistered button
-		break;
-	}
-	cout << "\a"; //if a function has got this far, it has not been able to complete it's intended function
-	return 0; //return a 0; I'll likely never read the return values from this function but it is useful just in case
-}
-
-void aiTurn(int whichPlayer, int softLimit) {
-	int currentTotal = turnOrder[whichPlayer]->blackJackValue(1);
-	if (currentTotal < softLimit && standardDeck.getCards().size() > 1) {
-		drawnCard = standardDeck.drawTopCard();
+	int currentTotal = turnOrder[whichPlayer]->blackJackValue(1); //get AI's current hand value
+	if (currentTotal < softLimit && standardDeck->getCards().size() > 1) { //if the AI is below it's comfortable limit and there's cards left in the deck
+		drawnCard = standardDeck->drawTopCard(); //have a card drawn
 		drawnCard.flip();
-		turnOrder[whichPlayer]->placeCardAtTop(drawnCard);
+		turnOrder[whichPlayer]->placeCardAtTop(drawnCard); //and added to their hand
 		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
-		cout << "Hit";
+		cout << "Hit"; //announce that it's hit for a new card
+		return true;
 	}
-	else if (currentTotal <= 21) {
+	else if (currentTotal <= 21) { //else if it's above it's comfortable limit
 		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
-		cout << "Stand";
-		whoseTurn++;
+		cout << "Stand"; //announce that it's finished it's turn
 	}
-	else {
+	else { //By logical elimination, this means they're bust
 		gf::coords(talkCoords[whichPlayer][0], talkCoords[whichPlayer][1]);
-		turnOrder[whichPlayer]->showAll();
-		cout << "Bust";
-		whoseTurn++;
+		turnOrder[whichPlayer]->showAll(); //put hand face up
+		cout << "Bust"; //announce bust
 	}
-
+	return false;
 }
 
 int main() {
+	int function = 0;
+	//Global variables
+	int whoseTurn = 0;
+	bool drewQuery = false; //for blackjack, used as a flag for whether the current AI has drawn a card on this loop of main, so that the loop where it would display "Stand" or "Bust" doesn't get skipped
+
+	Deck resetDeck = Deck( //A full deck of cards used to reset other decks
+		vector<Card>{
+		Card("diamonds", "A", "red", 6, 0), Card("diamonds", "2", "red", 0, 0), Card("diamonds", "3", "red", 0, 0), Card("diamonds", "4", "red", 0, 0),
+			Card("diamonds", "5", "red", 0, 0), Card("diamonds", "6", "red", 0, 0), Card("diamonds", "7", "red", 0, 0), Card("diamonds", "8", "red", 0, 0),
+			Card("diamonds", "9", "red", 0, 0), Card("diamonds", "X", "red", 0, 0), Card("diamonds", "J", "red", 0, 0), Card("diamonds", "Q", "red", 0, 0),
+			Card("diamonds", "K", "red", 0, 0),
+			Card("clubs", "A", "black", 0, 0), Card("clubs", "2", "black", 0, 8), Card("clubs", "3", "black", 0, 0), Card("clubs", "4", "black", 0, 0),
+			Card("clubs", "5", "black", 0, 0), Card("clubs", "6", "black", 0, 0), Card("clubs", "7", "black", 0, 0), Card("clubs", "8", "black", 0, 0),
+			Card("clubs", "9", "black", 0, 0), Card("clubs", "X", "black", 0, 0), Card("clubs", "J", "black", 0, 0), Card("clubs", "Q", "black", 0, 0),
+			Card("clubs", "K", "black", 0, 0),
+			Card("hearts", "A", "red", 0, 0), Card("hearts", "2", "red", 0, 0), Card("hearts", "3", "red", 0, 0), Card("hearts", "4", "red", 0, 0),
+			Card("hearts", "5", "red", 0, 0), Card("hearts", "6", "red", 4, 5), Card("hearts", "7", "red", 0, 0), Card("hearts", "8", "red", 0, 0),
+			Card("hearts", "9", "red", 0, 0), Card("hearts", "X", "red", 0, 0), Card("hearts", "J", "red", 0, 0), Card("hearts", "Q", "red", 0, 0),
+			Card("hearts", "K", "red", 0, 0),
+			Card("spades", "A", "black", 0, 0), Card("spades", "2", "black", 0, 0), Card("spades", "3", "black", 0, 0), Card("spades", "4", "black", 0, 0),
+			Card("spades", "5", "black", 0, 0), Card("spades", "6", "black", 0, 0), Card("spades", "7", "black", 0, 0), Card("spades", "8", "black", 0, 0),
+			Card("spades", "9", "black", 0, 0), Card("spades", "X", "black", 0, 0), Card("spades", "J", "black", 0, 0), Card("spades", "Q", "black", 0, 0),
+			Card("spades", "K", "black", 0, 0)
+	}); //I don't care. This works
+
+	//card vars with names general enough I canuse them across gamemodes
+	Card drawnCard;
+	Deck standardDeck;
+	Deck playerHand;
+	//blackjack specific card vars
+	Deck dealerHand;
+	Deck ai1Hand;
+	Deck ai2Hand;
+	Deck ai3Hand;
+	Deck ai4Hand;
+	vector<Deck*> turnOrder = { &ai1Hand, &ai2Hand, &playerHand, &ai3Hand, &ai4Hand, &dealerHand };
+	//solitaire specific card vars
+	Deck drawnDeck;
+	Deck stack0;
+	Deck stack1;
+	Deck stack2;
+	Deck stack3;
+	Deck stack4;
+	Deck stack5;
+	Deck stack6;
+	Deck diamonds;
+	Deck clubs;
+	Deck hearts;
+	Deck spades;
+
 	//Buttons
 	///mainMenu
-	Button buttonBlackJack = Button(0, 10, "Blackjack", 0);
-	Button buttonSolitaire = Button(0, 13, "Solitaire", 1);
-	Button exitGame = Button(0, 16, "Exit", 2);
+	Button buttonBlackJack = Button(0, 10, "Blackjack", "toBlackJack");
+	Button buttonSolitaire = Button(0, 13, "Solitaire", "toSolitaire");
+	Button exitGame = Button(0, 16, "Exit", "quit");
 	///blackjack in-game
-	Button hitButton = Button(65, 37, "Hit", 3);
-	Button standButton = Button(85, 37, "Stand", 4);
-	Button splitButton = Button(105, 37, "Split", 5);
-	Button turnButton = Button(85, 37, "Next", -1);
-	Button keepPlaying = Button(65, 37, "Yes", 7);
-	Button returnToMenu = Button(85, 37, "No", 6);
+	Button hitButton = Button(65, 37, "Hit", "hit");
+	Button standButton = Button(85, 37, "Stand", "stand");
+	Button splitButton = Button(105, 37, "Split", "split");
+	Button turnButton = Button(85, 37, "Next", "null");
+	Button keepPlaying = Button(65, 37, "Yes", "toBlackJack");
+	Button returnToMenu = Button(85, 37, "No", "toMenu");
 	///solitaire in-game
 	////solitaire take
-	Button drawMore = Button(1, 25, "Draw", 8);
-	Button takeFromDeck = Button(1, 28, "Take", 9);
-	Button takeS0 = Button(14, 28, "Take", 12);
-	Button takeS1 = Button(21, 28, "Take", 12);
-	Button takeS2 = Button(28, 28, "Take", 12);
-	Button takeS3 = Button(35, 28, "Take", 12);
-	Button takeS4 = Button(42, 28, "Take", 12);
-	Button takeS5 = Button(49, 28, "Take", 12);
-	Button takeS6 = Button(56, 28, "Take", 12);
+	Button drawMore = Button(1, 20, "Draw", "solitaireDraw");
+	Button takeFromDeck = Button(1, 23, "Take", "takeFromDeck");
+	Button takeS0 = Button(14, 23, "Take", "takeFromStack");
+	Button takeS1 = Button(21, 23, "Take", "takeFromStack");
+	Button takeS2 = Button(28, 23, "Take", "takeFromStack");
+	Button takeS3 = Button(35, 23, "Take", "takeFromStack");
+	Button takeS4 = Button(42, 23, "Take", "takeFromStack");
+	Button takeS5 = Button(49, 23, "Take", "takeFromStack");
+	Button takeS6 = Button(56, 23, "Take", "takeFromStack");
 	////solitaire place
-	Button placeDeck = Button(1, 28, "Deck", 10);
-	Button placeS0 = Button(14, 28, "  1  ", 10);
-	Button placeS1 = Button(21, 28, "  2  ", 10);
-	Button placeS2 = Button(28, 28, "  3  ", 10);
-	Button placeS3 = Button(35, 28, "  4  ", 10);
-	Button placeS4 = Button(42, 28, "  5  ", 10);
-	Button placeS5 = Button(49, 28, "  6  ", 10);
-	Button placeS6 = Button(56, 28, "  7  ", 10);
-	Button placeSort = Button(63, 28, "Sort", 11);
+	Button placeS0 = Button(14, 23, " 1 ", "placeOnStack");
+	Button placeS1 = Button(21, 23, " 2 ", "placeOnStack");
+	Button placeS2 = Button(28, 23, " 3 ", "placeOnStack");
+	Button placeS3 = Button(35, 23, " 4 ", "placeOnStack");
+	Button placeS4 = Button(42, 23, " 5 ", "placeOnStack");
+	Button placeS5 = Button(49, 23, " 6 ", "placeOnStack");
+	Button placeS6 = Button(56, 23, " 7 ", "placeOnStack");
+	Button placeSort = Button(63, 23, "Sort", "placeOnSorted");
 	//UIs
 	UserInterface mainMenu = UserInterface(vector<vector<Button>>{ { buttonBlackJack }, { buttonSolitaire }, { exitGame } });
 	UserInterface blackJackMenu = UserInterface(vector<vector<Button>>{{hitButton, standButton, splitButton}});
 	UserInterface blankMenu = UserInterface(vector<vector<Button>>{{turnButton}});
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
 	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, {takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6}});
-	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeDeck, placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6}});
-	int currentTotal;
+	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6}});
+	UserInterface currentUI; //the UI that holds a copy of whichever of the above is currently in use
 	init();
 
-	vector<Deck*> dealOrder = { &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6};
+	vector<Deck*> dealOrder = { &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
+	vector<Deck*> stacks = { &standardDeck, &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
 
 	while (true){ //main game loop
-		gameLoop:
 		switch (gf::gamemode) {
 		case 0: //shows the main menu
 			currentUI.copyButtons(&mainMenu);
@@ -289,7 +210,6 @@ int main() {
 
 			standardDeck.renderAll(); 
 			firstDeal(&standardDeck, &dealerHand, &playerHand, &ai1Hand, &ai2Hand, &ai3Hand, &ai4Hand); //deals 2 cards to each player
-			turnOrder = { &ai1Hand, &ai2Hand, &playerHand, &ai3Hand, &ai4Hand, &dealerHand }; //defines the turn order
 			gamemode = 2;
 			whoseTurn = -1;
 			currentUI.copyButtons(&blankMenu);
@@ -302,26 +222,41 @@ int main() {
 				break;
 			case 0: //first ai
 				currentUI.copyButtons(&blankMenu);
-				aiTurn(0, 16);
+				drewQuery = aiTurn(0, 16, &standardDeck, turnOrder);
+				if (!drewQuery){
+					whoseTurn++;
+				}
 				break;
 			case 1: //second ai
 				currentUI.copyButtons(&blankMenu);
-				aiTurn(1, 20);
+				drewQuery = aiTurn(1, 20, &standardDeck, turnOrder);
+				if (!drewQuery) {
+					whoseTurn++;
+				}
 				break;
 			case 2:
 				currentUI.copyButtons(&blackJackMenu);
 				break;
 			case 3: //third ai (after the player)
 				currentUI.copyButtons(&blankMenu);
-				aiTurn(3, 17);
+				drewQuery = aiTurn(3, 17, &standardDeck, turnOrder);
+				if (!drewQuery) {
+					whoseTurn++;
+				}
 				break;
 			case 4: //fourth ai
 				currentUI.copyButtons(&blankMenu);
-				aiTurn(4, 15);
+				drewQuery = aiTurn(4, 15, &standardDeck, turnOrder);
+				if (!drewQuery) {
+					whoseTurn++;
+				}
 				break;
 			case 5: //fifth ai (dealer)
 				currentUI.copyButtons(&blankMenu);
-				aiTurn(5, 16);
+				drewQuery = aiTurn(5, 16, &standardDeck, turnOrder);
+				if (!drewQuery) {
+					whoseTurn++;
+				}
 				break;
 			case 6:
 				currentUI.copyButtons(&postBlackJackMenu);
@@ -383,7 +318,7 @@ int main() {
 			gf::coords(scoreCoords[5][0], scoreCoords[5][1]);
 			cout << "Total: " << dealerHand.blackJackValue("string");
 			break;
-		case 3: //patience setup
+		case 3: //solitaire setup
 			//empty the suit-sorting-stacks
 			diamonds = Deck(vector<Card>{});
 			clubs = Deck(vector<Card>{});
@@ -409,9 +344,9 @@ int main() {
 			gamemode = 4;
 			currentUI.copyButtons(&solitaireTakeMenu);
 			standardDeck.renderAll();
-			continue; //makes everything render properly for the first loop of patience
+			continue; //makes everything render properly for the first loop of solitaire
 			break;
-		case 4: //patience gameloop
+		case 4: //solitaire gameloop
 			if (playerHand.getCards().size() == 0) { //decide ui
 				currentUI.copyButtons(&solitaireTakeMenu);
 			}
@@ -421,7 +356,7 @@ int main() {
 
 			playerHand.spreadVert(70, 1);
 			for (int i = 0; i < 7; i++) { //organise cards
-				if (dealOrder[i]->getCards().size() > 12) {
+				if (dealOrder[i]->getCards().size() > 10) {
 					dealOrder[i]->spreadVertCompressed(stackCoords[i][0], stackCoords[i][1]);
 				}
 				else {
@@ -436,12 +371,10 @@ int main() {
 			coords(70, 0);
 			cout << "Held";
 			//fake cards
-			Card("diamonds", " ", "dGrey", 63, 1).render();
-			Card("clubs", " ", "lGrey", 63, 7).render();
-			Card("hearts", " ", "dGrey", 63, 13).render();
-			Card("spades", " ", "lGrey", 63, 19).render();
 			//cards
 			standardDeck.renderAll();
+			drawnDeck.spreadVertLimited(1, 10, min(3, drawnDeck.getCards().size()));
+			drawnDeck.renderAll();
 			stack0.renderAll();
 			stack1.renderAll();
 			stack2.renderAll();
@@ -449,6 +382,10 @@ int main() {
 			stack4.renderAll();
 			stack5.renderAll();
 			stack6.renderAll();
+			Card("diamonds", " ", "dGrey", 63, 1).render();
+			Card("clubs", " ", "lGrey", 63, 7).render();
+			Card("hearts", " ", "dGrey", 63, 13).render();
+			Card("spades", " ", "lGrey", 63, 19).render();
 			playerHand.renderAll();
 
 			break;
@@ -458,6 +395,7 @@ int main() {
 		currentUI.renderUI();
 		//input processing
 		int ch = _getch(); //gets the latest keyboard input
+		function = -1;
 		if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first, useless one
 			ch = _getch(); //then gets the real arrow value
 			switch (ch) { //this switch is nested here so it will only respond to presses of the arrow keys
@@ -480,16 +418,69 @@ int main() {
 		else { //this switch responds to everything else
 			switch (ch) {
 			case 13: //enter
-				buttonPress(currentUI.getCurrentlySelected().getFunctionID()); //triggers the specfic function for whichever button is selected
+				function = currentUI.getCurrentlySelected().getFunctionID(); //triggers the specfic function for whichever button is selected
 				break;
 			default:
 				break;
 			}
 		}
+
+		//when enter key is registered above, the function var is set to which
+		Card drawnCard;
+		switch (function) {
+		case -1: //do nothing
+			break;
+		case 0: //enter the blackjack setup scene
+			standardDeck = resetDeck;
+			gamemode = 1;
+			break;
+		case 1: //enter the solitaire setup scene
+			gamemode = 3;
+			break;
+		case 2: // return to menu
+			gamemode = 0;
+			break;
+		case 3: //exit the game
+			gamemode = 5;
+			break;
+		case 4: //"hit" in blackjack and picking up the top unstacked/unsorted card in solitaire 
+			if (standardDeck.getCards().size() > 1) {
+				drawnCard = standardDeck.drawTopCard();
+				drawnCard.setFace(true);
+				playerHand.placeCardAtTop(drawnCard);
+				break;
+			}
+			break;
+		case 5: //"stand" in blackjack
+			whoseTurn++;
+			break;
+		case 6: //"split" in blackjack
+			if (playerHand.getCards().size() == 2 && values[playerHand.getCards()[0].getValue()] == values[playerHand.getCards()[1].getValue()]) {
+				playerHand.drawTopCard();
+				drawnCard = standardDeck.drawTopCard();
+				drawnCard.flip();
+				playerHand.placeCardAtTop(drawnCard);
+				break;
+			}
+			break;
+		case 7:
+			for (int i = 0; i < 3; i++) {
+				drawnCard = standardDeck.drawTopCard();
+				drawnCard.setFace(true);
+				drawnDeck.placeCardAtTop(drawnCard);
+			}
+			break;
+		case 8:
+			drawnCard = drawnDeck.drawTopCard();
+			playerHand.placeCardAtTop(drawnCard);
+			break;
+		default: //unregistered button
+			break;
+		}
+
 		GetWindowRect(console, &r);
 		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
 		clearScreen();
-		continue;
 	}
 	return 1;
 }

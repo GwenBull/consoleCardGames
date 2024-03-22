@@ -50,7 +50,8 @@ void Deck::hideAll() { //sets every Card in this Deck to face down
 	}
 }
 
-void Deck::flipSpecific(int which, bool face) {
+void Deck::flipSpecific(size_t which, bool face) { //uses size_t instead of int because vector.size() is a size_t, so the function uses it to prevent a compiler warning about truncation
+												   //which happens when casting size_t to int
 	this->cards[which].setFace(face);
 }
 
@@ -66,9 +67,18 @@ void Deck::spreadVert(int x, int y) { //distributes the Deck vertically from a s
 	}
 }
 
-void Deck::spreadVertCompressed(int x, int y) { //distributes the Deck vertically from a specified position
+void Deck::spreadVertCompressed(int x, int y) { //distributes the Deck vertically from a specified position with a smaller gap
 	for (int i = 0; i < this->cards.size(); i++) {
 		this->cards[i].setPos(x, y + i);
+	}
+}
+
+void Deck::spreadVertLimited(int x, int y, int max) { //distributes the top n cards of the Deck vertically from a specified position
+	for (int i = 0; i < this->cards.size(); i++) {
+		this->cards[i].setPos(x, y);
+	}
+	for (int i = 0; i < max; i++) {
+		this->cards[this->cards.size() - (max - i)].setPos(x, y + (i * 2));
 	}
 }
 

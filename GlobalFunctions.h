@@ -21,6 +21,7 @@ namespace gf {
     extern HWND console;
     extern RECT r;
     extern int gamemode;
+    extern map<string, int> buttonFuncs;
 
     //global functions (defined below)
     static void coords(int x, int y);

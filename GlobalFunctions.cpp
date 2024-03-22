@@ -8,3 +8,21 @@ map<string, int> gf::colours = { {"red", 244}, {"black", 240}, {"blue", 243}, {"
 HWND gf::console = GetConsoleWindow();
 RECT gf::r;
 int gf::gamemode = 0;
+map<string, int> gf::buttonFuncs = {
+	{"null", -1},
+	{"toBlackJack", 0},
+	{"toSolitaire", 1},
+	{"toMenu", 2},
+	{"quit", 3},
+	{"hit", 4},
+	{"stand", 5},
+	{"split", 6},
+	{"solitaireDraw", 7},
+	{"takeFromDeck", 8},
+	{"takeFromStack", 9},
+	{"stackTakeOne", 10},
+	{"stackTakeAll", 11},
+	{"undo", 12},
+	{"placeOnStack", 13},
+	{"placeOnSorted", 14}
+};

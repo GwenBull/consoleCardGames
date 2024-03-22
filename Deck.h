@@ -25,13 +25,15 @@ public:
 
 	void hideAll();
 
-	void flipSpecific(int which, bool face);
+	void flipSpecific(size_t which, bool face);
 
 	void stack(int x, int y);
 
 	void spreadVert(int x, int y);
 
 	void spreadVertCompressed(int x, int y);
+
+	void spreadVertLimited(int x, int y, int max);
 
 	void spreadHoriz(int x, int y);
 

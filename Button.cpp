@@ -2,7 +2,7 @@
 using namespace std;
 using namespace gf;
 
-Button::Button(int x, int y, string text, int function) {
+Button::Button(int x, int y, string text, string function) {
 	this->x = x;
 	this->y = y;
 	this->text = text;
@@ -27,5 +27,5 @@ string Button::getText() {
 }
 
 int Button::getFunctionID() {
-	return this->function;
+	return buttonFuncs.find(this->function)->second;
 }
