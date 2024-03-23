@@ -80,9 +80,3 @@ void Card::render() {
 	}
 }
 
-string Card::evaluateCard(Card* compCard) {
-	if (compCard->getValue() == this->value && compCard->getHouse() == this->house && compCard->getColour() == this->colour) {
-		return "VH";
-	}
-	else if (compCard->getValue() == this->value && compCard->getHouse() == this->house) {}
-}

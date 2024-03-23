@@ -16,6 +16,7 @@ namespace gf {
     //global variables (defined in GlobalFunctions.cpp)
     extern map<string, char> suits;
     extern map<string, int> values;
+    extern map<string, int> solitaireValues;
     extern HANDLE hConsole;
     extern map<string, int> colours;
     extern HWND console;

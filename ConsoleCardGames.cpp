@@ -56,7 +56,7 @@ void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck
 	vector<Deck*> dealOrder = { s0, s1, s2, s3, s4, s5, s6 };
 	for (int i = 0; i < 7; i++) { //for the 7 initital stacks
 		for (int j = i; j < 7; j++) { //for the (up to) 7 cards per stack
-			//Sleep(208); //wait a reasonable time
+			Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a card
 			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
 			dealOrder[j]->spreadVert(stackCoords[j][0], stackCoords[j][1]); //place the stack at the right place
@@ -151,8 +151,9 @@ int main() {
 			Card("spades", "K", "black", 0, 0)
 	}); //I don't care. This works
 
-	//card vars with names general enough I canuse them across gamemodes
+	//card vars with names general enough I can use them across gamemodes
 	Card drawnCard;
+	Card compCard;
 	Deck standardDeck;
 	Deck playerHand;
 	//blackjack specific card vars
@@ -220,12 +221,14 @@ int main() {
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
 	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, {takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6}});
 	UserInterface solitaireTakeOptions = UserInterface(vector<vector<Button>>{{takeOne, takeAll}});
-	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6, placeUndo}});
+	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6, placeSort, placeUndo}});
 	UserInterface currentUI; //the UI that holds a copy of whichever of the above is currently in use
 	init();
 
 	vector<Deck*> dealOrder = { &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
 	vector<Deck*> stacks = { &standardDeck, &stack0, &stack1, &stack2, &stack3, &stack4, &stack5, &stack6 };
+	int undoPlace = 0;
+	int takeableCards;
 
 	while (true){ //main game loop
 		switch (gf::gamemode) {
@@ -426,6 +429,10 @@ int main() {
 			Card("clubs", " ", "lGrey", 63, 7).render();
 			Card("hearts", " ", "dGrey", 63, 13).render();
 			Card("spades", " ", "lGrey", 63, 19).render();
+			diamonds.renderAll();
+			clubs.renderAll();
+			hearts.renderAll();
+			spades.renderAll();
 			playerHand.renderAll();
 
 			break;
@@ -474,19 +481,32 @@ int main() {
 				break;
 			}
 			break;
-		case 8:
-			for (int i = 0; i < 3; i++) {
-				drawnCard = standardDeck.drawTopCard();
-				drawnCard.setFace(true);
-				drawnDeck.placeCardAtTop(drawnCard);
+		case 8: //turn over 3 cards in solitaire
+			if (standardDeck.getCards().size() > 0) {
+				takeableCards = min(3, standardDeck.getCards().size());
+				for (int i = 0; i < takeableCards; i++) {
+					drawnCard = standardDeck.drawTopCard();
+					drawnCard.setFace(true);
+					drawnDeck.placeCardAtTop(drawnCard);
+				}
+			}
+			else {
+				takeableCards = drawnDeck.getCards().size();
+				for (int i = 0; i < takeableCards; i++) {
+					drawnCard = drawnDeck.drawTopCard();
+					drawnCard.setFace(false);
+					standardDeck.placeCardAtTop(drawnCard);
+				}
+				standardDeck.stack(1, 1);
 			}
 			break;
-		case 9:
+		case 9: //take a card from the deck in solitaire
 			drawnCard = drawnDeck.drawTopCard();
 			playerHand.placeCardAtTop(drawnCard);
+			undoPlace = 0;
 			break;
-		case 10:
-			tempHand = Deck(stacks[currentUI.getSelectionVal()[0]]->getCards());
+		case 10: //take from a solitaire stack
+			undoPlace = currentUI.getSelectionVal()[0];
 			while (true) { //creates a temporary gameloop to allow selection between the "take one" and "take all" without affecting anything that was already on the screen
 				currentUI.copyButtons(&solitaireTakeOptions);
 				rect(28, 26, 52, 3, "whiteText"); //rectangle that covers only these new elements instead of clearing the whole screen
@@ -497,12 +517,168 @@ int main() {
 				}
 			}
 			break;
+		case 11: //only taking one card from a stack
+			drawnCard = stacks[undoPlace]->drawTopCard();
+			playerHand.placeCardAtTop(drawnCard);
+			break;
+		case 12: //taking all face up cards
+			takeableCards = stacks[undoPlace]->getCards().size();
+			for (int i = 0; i < takeableCards; i++) {
+				if (stacks[undoPlace]->getCards()[stacks[undoPlace]->getCards().size() - 1].getFace() == true) {
+					drawnCard = stacks[undoPlace]->drawTopCard();
+					playerHand.placeCardAtTop(drawnCard);
+				}
+			}
+			break;
+		case 13: //"Put back" button in solitaire, returns player hand to where it was taken from without changing anything else
+			if (undoPlace > 0) {
+				takeableCards = playerHand.getCards().size();
+				for (int i = 0; i < takeableCards; i++) {
+					drawnCard = playerHand.drawTopCard();
+					stacks[undoPlace]->placeCardAtTop(drawnCard);
+				}
+			}
+			else {
+				drawnCard = playerHand.drawTopCard();
+				drawnDeck.placeCardAtTop(drawnCard);
+			}
+			break;
+		case 14: //place all your held cards onto a stack
+			takeableCards = playerHand.getCards().size();
+			for (int i = 0; i < takeableCards; i++) {
+				drawnCard = playerHand.drawTopCard();
+				if (drawnCard.getValue() == "K") { //if the card to be placed is a king
+					if (stacks[currentUI.getSelectionVal()[0] + 1]->getCards().size() == 0) {
+						stacks[currentUI.getSelectionVal()[0] + 1]->placeCardAtTop(drawnCard);
+					}
+				}
+				else if (stacks[currentUI.getSelectionVal()[0] + 1]->getCards().size() > 0){ //if there's a stack at the attempted position
+					compCard = stacks[currentUI.getSelectionVal()[0] + 1]->getCards()[stacks[currentUI.getSelectionVal()[0] + 1]->getCards().size() - 1];
+					if (compCard.getFace() == true){ //if the stack has a face-up top card
+						if (solitaireValues[drawnCard.getValue()] == solitaireValues[compCard.getValue()] - 1) { //if the card to place is one less than the card to be placed on
+							if (drawnCard.getColour() != compCard.getColour()) { //and their colours don't match
+								stacks[currentUI.getSelectionVal()[0] + 1]->placeCardAtTop(drawnCard); //place the top card from the player hand
+							}
+							else {
+								playerHand.placeCardAtTop(drawnCard);
+							}
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+						}
+					}
+					else {
+						playerHand.placeCardAtTop(drawnCard);
+					}
+				}
+				else {
+					playerHand.placeCardAtTop(drawnCard);
+				}
+			}
+			if (undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0 && playerHand.getCards().size() == 0) { //once your cards have been placed 
+				stacks[undoPlace]->flipSpecific(stacks[undoPlace]->getCards().size() - 1, true); //reveal the next card from the stack that it was taken from
+			}
+			break;
+		case 15: //sort your held card into its suit stack
+			if (playerHand.getCards().size() == 1) { //only allow when the player only has one card
+				drawnCard = playerHand.drawTopCard();
+				if (drawnCard.getHouse() == "diamonds") { //if your card is a diamond
+					if (diamonds.getCards().size() == 0) { //if the diamonds are empty
+						if (drawnCard.getValue() == "A") { //and yours is an ace
+							diamonds.placeCardAtTop(drawnCard); //start the diamonds stack
+						}
+						else { //if yours isn't an ace
+							playerHand.placeCardAtTop(drawnCard); //put it back in your hand
+							break; //skip the rest of this function
+						}
+					}
+					else {
+						if (solitaireValues[drawnCard.getValue()] - 1 == solitaireValues[diamonds.getCards()[diamonds.getCards().size() - 1].getValue()]) { //if yours is 1 above the current top sorted
+							diamonds.placeCardAtTop(drawnCard); //add yours on top
+						}
+						else { //if it isn't the next value
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					diamonds.stack(63, 1);
+				}
+				else if (drawnCard.getHouse() == "clubs") { //operates the same as the diamonds
+					if (clubs.getCards().size() == 0) {
+						if (drawnCard.getValue() == "A") {
+							clubs.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					else {
+						if (solitaireValues[drawnCard.getValue()] - 1 == solitaireValues[clubs.getCards()[clubs.getCards().size() - 1].getValue()]) {
+							clubs.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					clubs.stack(63, 7);
+				}
+				else if (drawnCard.getHouse() == "hearts") {
+					if (hearts.getCards().size() == 0) {
+						if (drawnCard.getValue() == "A") {
+							hearts.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					else {
+						if (solitaireValues[drawnCard.getValue()] - 1 == solitaireValues[hearts.getCards()[hearts.getCards().size() - 1].getValue()]) {
+							hearts.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					hearts.stack(63, 13);
+				}
+				else if (drawnCard.getHouse() == "spades") {
+					if (spades.getCards().size() == 0) {
+						if (drawnCard.getValue() == "A") {
+							spades.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					else {
+						if (solitaireValues[drawnCard.getValue()] - 1 == solitaireValues[spades.getCards()[spades.getCards().size() - 1].getValue()]) {
+							spades.placeCardAtTop(drawnCard);
+						}
+						else {
+							playerHand.placeCardAtTop(drawnCard);
+							break;
+						}
+					}
+					spades.stack(63, 19);
+				}
+				//if any successful placement was made
+				if (undoPlace > 0) {
+					stacks[undoPlace]->flipSpecific(stacks[undoPlace]->getCards().size() - 1, true); //show the next card on the stack where the sorted card was originally
+				}
+			}
+			break;
 		default: //unregistered button
 			break;
 		}
 
 		GetWindowRect(console, &r);
 		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
+		//Sleep(1000);
 		clearScreen();
 	}
 	return 1;

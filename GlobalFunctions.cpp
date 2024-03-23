@@ -22,6 +22,21 @@ map<string, int> gf::values = { //maps the face value of each card to it's numer
 	{"Q", 10},
 	{"K", 10} 
 };
+map<string, int> gf::solitaireValues = { //maps the face value of each card to it's numerical value for solitaire
+	{"A", 1},
+	{"2", 2},
+	{"3", 3},
+	{"4", 4},
+	{"5", 5},
+	{"6", 6},
+	{"7", 7},
+	{"8", 8},
+	{"9", 9},
+	{"X", 10},
+	{"J", 11},
+	{"Q", 12},
+	{"K", 13}
+};
 map<string, int> gf::buttonFuncs = { //maps the names of button functions to an integer value for the function switch statement
 	{"null", 0},
 	{"toBlackJack", 1},
@@ -38,7 +53,8 @@ map<string, int> gf::buttonFuncs = { //maps the names of button functions to an 
 	{"stackTakeAll", 12},
 	{"undo", 13},
 	{"placeOnStack", 14},
-	{"placeOnSorted", 15}
+	{"placeOnSorted", 15},
+	{"undoDraw", 16}
 };
 map<string, int> gf::colours = { //maps names of colours to consoleTextAttribute codes
 	{"red", 244}, //red text on a white background
