@@ -56,7 +56,7 @@ void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck
 	vector<Deck*> dealOrder = { s0, s1, s2, s3, s4, s5, s6 };
 	for (int i = 0; i < 7; i++) { //for the 7 initital stacks
 		for (int j = i; j < 7; j++) { //for the (up to) 7 cards per stack
-			Sleep(208); //wait a reasonable time
+			//Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a card
 			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
 			dealOrder[j]->spreadVert(stackCoords[j][0], stackCoords[j][1]); //place the stack at the right place
@@ -93,9 +93,13 @@ bool aiTurn(int whichPlayer, int softLimit, Deck* standardDeck, vector<Deck*> tu
 
 int readInput(UserInterface* currentUI) {
 	int function = -1;
+	int x = currentUI->getCurrentlySelected().getX();
+	int y = currentUI->getCurrentlySelected().getY(); 
+	int w = currentUI->getCurrentlySelected().getText().length() + 2;
 	int ch = _getch();
 	if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first, useless one
 		ch = _getch(); //then gets the real arrow value
+		rect(x, y, w, 3, "whiteText");
 		switch (ch) { //this switch is nested here so it will only respond to presses of the arrow keys
 		case 72: //up arrow
 			currentUI->selectionMoveUp();
@@ -116,6 +120,7 @@ int readInput(UserInterface* currentUI) {
 	else { //this switch responds to everything else
 		switch (ch) {
 		case 13: //enter
+			rect(x, y, w, 3, "whiteText");
 			function = currentUI->getCurrentlySelected().getFunctionID(); //triggers the specfic function for whichever button is selected
 			break;
 		default:
@@ -178,6 +183,11 @@ int main() {
 	Deck spades;
 	Deck tempHand;
 
+	//solitaire bounce variables
+	vector<int> directions; //the direction each card is going
+	vector<int> maxHeights; //the apex of each card's bounce
+	int nextCard; //the next card index to start animating
+
 	//Buttons
 	///mainMenu
 	Button buttonBlackJack = Button(0, 10, "Blackjack", "toBlackJack");
@@ -191,6 +201,8 @@ int main() {
 	Button keepPlaying = Button(65, 37, "Yes", "toBlackJack");
 	Button returnToMenu = Button(85, 37, "No", "toMenu");
 	///solitaire in-game
+	Button restart = Button(1, 26, "Restart", "toSolitaire");
+	Button toMenu = Button(14, 26, "Exit", "toMenu");
 	////solitaire take
 	Button drawMore = Button(1, 20, "Draw", "solitaireDraw");
 	Button takeFromDeck = Button(1, 23, "Take", "takeFromDeck");
@@ -219,7 +231,7 @@ int main() {
 	UserInterface blackJackMenu = UserInterface(vector<vector<Button>>{{hitButton, standButton, splitButton}});
 	UserInterface blankMenu = UserInterface(vector<vector<Button>>{{turnButton}});
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
-	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, {takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6}});
+	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, { takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6 }, { restart, toMenu }});
 	UserInterface solitaireTakeOptions = UserInterface(vector<vector<Button>>{{takeOne, takeAll}});
 	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6, placeSort, placeUndo}});
 	UserInterface currentUI; //the UI that holds a copy of whichever of the above is currently in use
@@ -240,6 +252,7 @@ int main() {
 			break;
 		case 1: //blackjack setup
 			//preparing the Deck on the table
+			clearScreen();
 			playerHand = Deck(vector<Card>{});
 			dealerHand = Deck(vector<Card>{});
 			ai1Hand = Deck(vector<Card>{});
@@ -346,6 +359,13 @@ int main() {
 			ai4Hand.renderAll();
 			dealerHand.spreadHoriz(handCoords[5][0], handCoords[5][1]);
 			dealerHand.renderAll();
+			//erase previous scores
+			rect(scoreCoords[0][0], scoreCoords[0][1], 14, 1, "whiteText");
+			rect(scoreCoords[1][0], scoreCoords[1][1], 14, 1, "whiteText");
+			rect(scoreCoords[2][0], scoreCoords[2][1], 14, 1, "whiteText");
+			rect(scoreCoords[3][0], scoreCoords[3][1], 14, 1, "whiteText");
+			rect(scoreCoords[4][0], scoreCoords[4][1], 14, 1, "whiteText");
+			rect(scoreCoords[5][0], scoreCoords[5][1], 14, 1, "whiteText");
 			//show hand values
 			SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 			gf::coords(scoreCoords[0][0], scoreCoords[0][1]);
@@ -363,6 +383,7 @@ int main() {
 			break;
 		case 3: //solitaire setup
 			//empty the suit-sorting-stacks
+			clearScreen();
 			diamonds = Deck(vector<Card>{});
 			clubs = Deck(vector<Card>{});
 			hearts = Deck(vector<Card>{});
@@ -378,6 +399,7 @@ int main() {
 			//empty the player held cards (should be empty already but safety first
 			playerHand = Deck(vector<Card>{});
 
+			drawnDeck = Deck(vector<Card>{});
 			standardDeck = resetDeck;
 			standardDeck.shuffle(); //shuffles the deck
 			standardDeck.hideAll(); //puts the deck face down
@@ -405,8 +427,30 @@ int main() {
 				else {
 					dealOrder[i]->spreadVert(stackCoords[i][0], stackCoords[i][1]);
 				}
+				dealOrder[i]->renderAll();
 			}
+
+			if (diamonds.getCards().size() == 13 && clubs.getCards().size() == 13 && hearts.getCards().size() == 13 && spades.getCards().size() == 13) { //if all of the cards are in their sorted stacks
+				for (int i = 0; i < 13; i++) {
+					drawnCard = diamonds.drawTopCard();
+					standardDeck.placeCardAtTop(drawnCard);
+					drawnCard = clubs.drawTopCard();
+					standardDeck.placeCardAtTop(drawnCard);
+					drawnCard = hearts.drawTopCard();
+					standardDeck.placeCardAtTop(drawnCard);
+					drawnCard = spades.drawTopCard();
+					standardDeck.placeCardAtTop(drawnCard);
+				}
+				for (int i = 0; i < 52; i++) {
+					directions.push_back(1 + (rand() % (int)(4 - 1 + 1)));
+					maxHeights.push_back(2 * floor(i / 4));
+					nextCard = 0;
+				}
+				gamemode = 6; //advance to the end screen
+			}
+
 			//Rendering
+			SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 			coords(1, 0);
 			cout << "Deck";
 			coords(63, 0);
@@ -418,13 +462,6 @@ int main() {
 			standardDeck.renderAll();
 			drawnDeck.spreadVertLimited(1, 10, min(3, drawnDeck.getCards().size()));
 			drawnDeck.renderAll();
-			stack0.renderAll();
-			stack1.renderAll();
-			stack2.renderAll();
-			stack3.renderAll();
-			stack4.renderAll();
-			stack5.renderAll();
-			stack6.renderAll();
 			Card("diamonds", " ", "dGrey", 63, 1).render();
 			Card("clubs", " ", "lGrey", 63, 7).render();
 			Card("hearts", " ", "dGrey", 63, 13).render();
@@ -438,6 +475,16 @@ int main() {
 			break;
 		case 5: //quit game
 			return 1;
+		case 6: //the solitaire bounce
+			for (int i = 0; i < nextCard; i++) {
+			}
+
+			standardDeck.renderAll();
+
+			break;
+		default:
+			gamemode = 0;
+			break;
 		}
 		currentUI.renderUI();
 		//input processing
@@ -456,6 +503,7 @@ int main() {
 			gamemode = 3;
 			break;
 		case 3: // return to menu
+			clearScreen();
 			gamemode = 0;
 			break;
 		case 4: //exit the game
@@ -470,6 +518,7 @@ int main() {
 			}
 			break;
 		case 6: //"stand" in blackjack
+			rect(65, 37, 47, 3, "whiteText");
 			whoseTurn++;
 			break;
 		case 7: //"split" in blackjack
@@ -489,6 +538,7 @@ int main() {
 					drawnCard.setFace(true);
 					drawnDeck.placeCardAtTop(drawnCard);
 				}
+				rect(1, 1, 5, 7, "whiteText");
 			}
 			else {
 				takeableCards = drawnDeck.getCards().size();
@@ -498,12 +548,16 @@ int main() {
 					standardDeck.placeCardAtTop(drawnCard);
 				}
 				standardDeck.stack(1, 1);
+				rect(1, 10, 5, 11, "whiteText");
 			}
 			break;
 		case 9: //take a card from the deck in solitaire
-			drawnCard = drawnDeck.drawTopCard();
-			playerHand.placeCardAtTop(drawnCard);
-			undoPlace = 0;
+			if (drawnDeck.getCards().size() > 0) {
+				drawnCard = drawnDeck.drawTopCard();
+				playerHand.placeCardAtTop(drawnCard);
+				undoPlace = 0;
+				rect(1, 23, 80, 3, "whiteText");
+			}
 			break;
 		case 10: //take from a solitaire stack
 			undoPlace = currentUI.getSelectionVal()[0];
@@ -513,6 +567,8 @@ int main() {
 				currentUI.renderUI(); //draw the UI
 				function = readInput(&currentUI);
 				if (function != -1) { //once an option actually entered,
+					rect(1, 23, 80, 9, "whiteText");
+					rect(stackCoords[undoPlace - 1][0], stackCoords[undoPlace - 1][1], 5, 23, "whiteText");
 					goto buttonFunctions; //takes the function number back to the main game loop
 				}
 			}
@@ -531,6 +587,8 @@ int main() {
 			}
 			break;
 		case 13: //"Put back" button in solitaire, returns player hand to where it was taken from without changing anything else
+			rect(1, 23, 80, 9, "whiteText");
+			rect(70, 1, 5, 23, "whiteText");
 			if (undoPlace > 0) {
 				takeableCards = playerHand.getCards().size();
 				for (int i = 0; i < takeableCards; i++) {
@@ -544,6 +602,8 @@ int main() {
 			}
 			break;
 		case 14: //place all your held cards onto a stack
+			rect(70, 1, 5, 23, "whiteText");
+			rect(1, 23, 80, 9, "whiteText");
 			takeableCards = playerHand.getCards().size();
 			for (int i = 0; i < takeableCards; i++) {
 				drawnCard = playerHand.drawTopCard();
@@ -580,6 +640,8 @@ int main() {
 			}
 			break;
 		case 15: //sort your held card into its suit stack
+			rect(1, 23, 80, 9, "whiteText");
+			rect(70, 1, 5, 23, "whiteText");
 			if (playerHand.getCards().size() == 1) { //only allow when the player only has one card
 				drawnCard = playerHand.drawTopCard();
 				if (drawnCard.getHouse() == "diamonds") { //if your card is a diamond
@@ -667,7 +729,7 @@ int main() {
 					spades.stack(63, 19);
 				}
 				//if any successful placement was made
-				if (undoPlace > 0) {
+				if (undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0) {
 					stacks[undoPlace]->flipSpecific(stacks[undoPlace]->getCards().size() - 1, true); //show the next card on the stack where the sorted card was originally
 				}
 			}
@@ -679,7 +741,7 @@ int main() {
 		GetWindowRect(console, &r);
 		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
 		//Sleep(1000);
-		clearScreen();
+		//clearScreen();
 	}
 	return 1;
 }
