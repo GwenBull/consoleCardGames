@@ -56,7 +56,7 @@ void solitaireSetup(Deck* mainPile, Deck* s0, Deck* s1, Deck* s2, Deck* s3, Deck
 	vector<Deck*> dealOrder = { s0, s1, s2, s3, s4, s5, s6 };
 	for (int i = 0; i < 7; i++) { //for the 7 initital stacks
 		for (int j = i; j < 7; j++) { //for the (up to) 7 cards per stack
-			//Sleep(208); //wait a reasonable time
+			Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a card
 			dealOrder[j]->placeCardAtTop(drawnCard); //deal the card
 			dealOrder[j]->spreadVert(stackCoords[j][0], stackCoords[j][1]); //place the stack at the right place
@@ -531,6 +531,7 @@ int main() {
 			}
 			break;
 		case 8: //turn over 3 cards in solitaire
+			//rect(1, 10, 5, 8, "whiteText");
 			if (standardDeck.getCards().size() > 0) {
 				takeableCards = min(3, standardDeck.getCards().size());
 				for (int i = 0; i < takeableCards; i++) {
@@ -552,11 +553,12 @@ int main() {
 			}
 			break;
 		case 9: //take a card from the deck in solitaire
+			rect(1, 10, 6, 20, "whiteText");
 			if (drawnDeck.getCards().size() > 0) {
 				drawnCard = drawnDeck.drawTopCard();
 				playerHand.placeCardAtTop(drawnCard);
 				undoPlace = 0;
-				rect(1, 23, 80, 3, "whiteText");
+				rect(1, 23, 80, 8, "whiteText");
 			}
 			break;
 		case 10: //take from a solitaire stack
