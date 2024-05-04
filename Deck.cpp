@@ -204,3 +204,24 @@ void Deck::reverseCards() {
 	reverse(this->cards.begin(), this->cards.end());
 
 }
+
+void Deck::copyAll(Deck* otherDeck) { //moves a copy of each card in otherDeck to the deck calling the function (without removing them from otherDeck
+	int size = otherDeck->getCards().size();
+	for (int i = 0; i < size; i++) {
+		Card drawnCard = otherDeck->drawTopCard();
+		this->placeCardAtTop(drawnCard);
+		otherDeck->reverseCards();
+		otherDeck->placeCardAtTop(drawnCard);
+		otherDeck->reverseCards();
+	}
+}
+
+void Deck::empty() {
+	for (int i = 0; i < this->getCards().size(); i++) {
+		this->drawTopCard();
+	}
+}
+
+void Deck::moveCard(int index, int newX, int newY) {
+	this->cards[index].setPos(newX, newY);
+}

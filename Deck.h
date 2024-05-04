@@ -44,4 +44,10 @@ public:
 	void renderAll();
 
 	void reverseCards();
+
+	void copyAll(Deck* copyDeck);
+	
+	void empty();
+
+	void moveCard(int index, int newX, int newY);
 };

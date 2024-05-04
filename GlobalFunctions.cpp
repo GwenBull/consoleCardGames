@@ -54,7 +54,13 @@ map<string, int> gf::buttonFuncs = { //maps the names of button functions to an 
 	{"undo", 13},
 	{"placeOnStack", 14},
 	{"placeOnSorted", 15},
-	{"undoDraw", 16}
+	{"undoDraw", 16},
+	{"1Deck", 17},
+	{"2Deck", 18},
+	{"4Deck", 19},
+	{"solo", 20},
+	{"group", 21},
+	{"beginBlackJack", 22} //ironic
 };
 map<string, int> gf::colours = { //maps names of colours to consoleTextAttribute codes
 	{"red", 244}, //red text on a white background
