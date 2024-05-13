@@ -133,6 +133,7 @@ void clearSolitaireDrawn() {
 void clearSolitaireButtons() {
 	rect(1, 23, 79, 6, "whiteText");
 	rect(1, 20, 6, 3, "whiteText");
+	rect(63, 29, 6, 5, "whiteText");
 }
 void clearSolitairePlay() {
 	rect(14, 1, 47, 22, "whiteText");
@@ -150,7 +151,7 @@ int readInput(UserInterface* currentUI) {
 	int y = currentUI->getCurrentlySelected().getY(); 
 	int w = currentUI->getCurrentlySelected().getText().length() + 2;
 	int ch = _getch();
-	if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first, useless one
+	if (ch == 224) { //since arrow keys technically give 2 inputs, this prunes the first one which is just a generic code to identify it as *any* of the arrow keys
 		ch = _getch(); //then gets the real arrow value
 		rect(x, y, w, 3, "whiteText");
 		switch (ch) { //this switch is nested here so it will only respond to presses of the arrow keys
@@ -214,7 +215,7 @@ int main() {
 	Card compCard;
 	Deck standardDeck;
 	Deck playerHand;
-	//blackjack specific  vars
+	//blackjack specific vars
 	int decks = 1;
 	string groupType = "solo";
 	int wins = 0;
@@ -227,7 +228,8 @@ int main() {
 	Deck ai3Hand;
 	Deck ai4Hand;
 	vector<Deck*> turnOrder = { &ai1Hand, &ai2Hand, &playerHand, &ai3Hand, &ai4Hand, &dealerHand };
-	//solitaire specific card vars
+	//solitaire specific vars
+	int difficulty = 1;
 	Deck drawnDeck;
 	Deck stack0;
 	Deck stack1;
@@ -252,12 +254,12 @@ int main() {
 	Button buttonSolitaire = Button(0, 13, "Solitaire", "toSolitaire");
 	Button exitGame = Button(0, 16, "Exit", "quit");
 	///blackjack settings
-	Button oneDeck = Button(12, 10, "one deck", "1Deck");
-	Button twoDeck = Button(24, 10, "two deck", "2Deck");
-	Button fourDeck = Button(36, 10, "four deck", "4Deck");
-	Button solo = Button(12, 13, "1 v 1", "solo");
-	Button group = Button(24, 13, "group", "group");
-	Button blackJackPlay = Button(12, 16, "begin", "beginBlackJack");
+	Button oneDeck = Button(12, 10, "One Deck", "1Deck");
+	Button twoDeck = Button(24, 10, "Two Deck", "2Deck");
+	Button fourDeck = Button(36, 10, "Four Deck", "4Deck");
+	Button solo = Button(12, 13, "1 V 1", "solo");
+	Button group = Button(24, 13, "Group", "group");
+	Button blackJackPlay = Button(12, 16, "Begin", "beginBlackJack");
 	///blackjack in-game
 	Button hitButton = Button(65, 37, "Hit", "hit");
 	Button standButton = Button(85, 37, "Stand", "stand");
@@ -265,6 +267,10 @@ int main() {
 	Button turnButton = Button(85, 37, "Next", "null");
 	Button keepPlaying = Button(65, 37, "Yes", "beginBlackJack");
 	Button returnToMenu = Button(85, 37, "No", "toMenu");
+	///solitaire settings
+	Button easyDiff = Button(12, 13, "Easy", "easy");
+	Button hardDiff = Button(24, 13, "Hard", "hard");
+	Button solitairePlay = Button(12, 16, "Begin", "beginSolitaire");
 	///solitaire in-game
 	Button restart = Button(1, 26, "Restart", "toSolitaire");
 	Button toMenu = Button(14, 26, "Exit", "toMenu");
@@ -278,6 +284,10 @@ int main() {
 	Button takeS4 = Button(42, 23, "Take", "takeFromStack");
 	Button takeS5 = Button(49, 23, "Take", "takeFromStack");
 	Button takeS6 = Button(56, 23, "Take", "takeFromStack");
+	Button takeDmnd = Button(63, 23, "Take", "takeFromSort");
+	Button takeClub = Button(63, 26, "Take", "takeFromSort");
+	Button takeHart = Button(63, 29, "Take", "takeFromSort");
+	Button takeSpad = Button(63, 32, "Take", "takeFromSort");
 	////take pt2
 	Button takeOne = Button(28, 26, "Take one", "stackTakeOne");
 	Button takeAll = Button(42, 26, "Take all", "stackTakeAll");
@@ -297,7 +307,8 @@ int main() {
 	UserInterface blackJackMenu = UserInterface(vector<vector<Button>>{{hitButton, standButton, splitButton}});
 	UserInterface blankMenu = UserInterface(vector<vector<Button>>{{turnButton}});
 	UserInterface postBlackJackMenu = UserInterface(vector<vector<Button>>{{keepPlaying, returnToMenu}});
-	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, { takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6 }, { restart, toMenu }});
+	UserInterface choicesSolitaire = UserInterface(vector<vector<Button>>{{easyDiff, hardDiff}, { solitairePlay }});
+	UserInterface solitaireTakeMenu = UserInterface(vector<vector<Button>>{{drawMore}, { takeFromDeck, takeS0, takeS1, takeS2, takeS3, takeS4, takeS5, takeS6, takeDmnd }, { restart, toMenu, takeClub }, { takeHart }, { takeSpad }});
 	UserInterface solitaireTakeOptions = UserInterface(vector<vector<Button>>{{takeOne, takeAll}});
 	UserInterface solitairePlaceMenu = UserInterface(vector<vector<Button>>{{placeS0, placeS1, placeS2, placeS3, placeS4, placeS5, placeS6, placeSort, placeUndo}});
 	UserInterface postSolitaireMenu = UserInterface(vector<vector<Button>>{{restart, toMenu}});
@@ -557,7 +568,7 @@ int main() {
 					directions.push_back(1 + (rand() % 4)); //gives each card a random direction 1-4 meaning one of the diagonals
 					nextCard = 0;
 				}
-				clearScreen();
+				clearSolitaireButtons();
 				gamemode = 6; //advance to the end screen
 				continue;
 			}
@@ -592,7 +603,7 @@ int main() {
 			for (int i = 0; i < min(nextCard/16, 52); i++) { //iterate through (up to) the whole deck of cards
 				int thisX = standardDeck.getCards()[i].getX();
 				int thisY = standardDeck.getCards()[i].getY();
-				rect(thisX, thisY, 5, 4, "whiteText"); //removes the trail, results in horrible flickering when all cards are moving, basically the same visual impact as clearScreen()
+				//rect(thisX, thisY, 5, 4, "whiteText"); //removes the previous draw of the card, results in horrible flickering when all cards are moving, basically the same visual impact as clearScreen()
 				if (directions[i] == 1) { //and move them according to their assigned direction
 					standardDeck.moveCard(i, thisX + 1, thisY - 1);
 					thisX++;
@@ -765,7 +776,7 @@ int main() {
 		case 9: //BlackJack options menu
 			currentUI.copyButtons(&choicesBlackJack);
 			coords(12, 9);
-			if (currentUI.getSelectionVal()[1] == 0) {
+			if (currentUI.getSelectionVal()[1] == 0) { //work out the highlighted option and explain it
 				if (currentUI.getSelectionVal()[0] == 0) {
 					cout << "play with one deck (the deck will not be reset until there aren't enough cards left for a deal)  ";
 				}
@@ -781,7 +792,7 @@ int main() {
 					cout << "play alone against the dealer                                                                    ";
 				}
 				else if (currentUI.getSelectionVal()[0] == 1) {
-					cout << "play with a group (of CPU opponents)                                                             ";
+					cout << "play with a group (of CPU opponents)                                                             "; //big spaces at the end to efficiently blank out the previously selected option
 				}
 			}
 			else {
@@ -791,6 +802,23 @@ int main() {
 			cout << "selected: " << decks;
 			coords(48, 14);
 			cout << "selected: " << groupType << " ";
+			break;
+		case 10: //Solitaire options menu
+			currentUI.copyButtons(&choicesSolitaire);
+			coords(12, 9);
+			if (currentUI.getSelectionVal()[1] == 0) {
+				if (currentUI.getSelectionVal()[0] == 0) {
+					cout << "draw from the deck one card at a time   ";
+				}
+				else {
+					cout << "draw from the deck three cards at a time";
+				}
+			}
+			else {
+				cout << "begin game                              ";
+			}
+			coords(36, 14);
+			cout << "selected: " << vector<string>{"nullOpt", "easy", "nullOpt", "hard"}[difficulty];
 			break;
 		default:
 			gamemode = 0;
@@ -809,8 +837,9 @@ int main() {
 			clearScreen();
 			gamemode = 9;
 			break;
-		case 2: //enter the solitaire setup scene
-			gamemode = 3;
+		case 2: //enter the solitaire options scene
+			clearScreen();
+			gamemode = 10;
 			break;
 		case 3: // return to menu
 			clearScreen();
@@ -843,9 +872,9 @@ int main() {
 				break;
 			}
 			break;
-		case 8: //turn over 3 cards in solitaire
+		case 8: //turn over 3 cards in solitaire (1 if easy mode)
 			if (standardDeck.getCards().size() > 0) { //if there are cards to turn over
-				takeableCards = min(3, standardDeck.getCards().size()); //work out if you need to take less than three
+				takeableCards = min(difficulty, standardDeck.getCards().size()); //work out if you need to take less than three
 				for (int i = 0; i < takeableCards; i++) {
 					drawnCard = standardDeck.drawTopCard(); //take the cards
 					drawnCard.setFace(true);
@@ -905,10 +934,30 @@ int main() {
 		case 13: //"Put back" button in solitaire, returns player hand to where it was taken from without changing anything else
 			clearSolitaireButtons();
 			clearSolitaireHand();
-			if (undoPlace > 0) {
+			if (undoPlace == 11) {
+				drawnCard = playerHand.drawTopCard();
+				spades.placeCardAtTop(drawnCard);
+				spades.stack(63, 19);
+			}
+			else if (undoPlace == 10) {
+				drawnCard = playerHand.drawTopCard();
+				hearts.placeCardAtTop(drawnCard);
+				hearts.stack(63, 13);
+			}
+			else if (undoPlace == 9) {
+				drawnCard = playerHand.drawTopCard();
+				clubs.placeCardAtTop(drawnCard);
+				clubs.stack(63, 7);
+			}
+			else if (undoPlace == 8) {
+				drawnCard = playerHand.drawTopCard();
+				diamonds.placeCardAtTop(drawnCard);
+				diamonds.stack(63, 1);
+			}
+			else if (8 > undoPlace && undoPlace > 0) {
 				takeableCards = playerHand.getCards().size();
 				for (int i = 0; i < takeableCards; i++) {
-					rect(stackCoords[undoPlace - 1][0], stackCoords[undoPlace - 1][1], 5, 23, "whiteText");
+					rect(stackCoords[undoPlace - 1][0], stackCoords[undoPlace - 1][1], 5, 23, "whiteText"); //clears the rendering of the stack the cards are being returned to
 					drawnCard = playerHand.drawTopCard();
 					stacks[undoPlace]->placeCardAtTop(drawnCard);
 				}
@@ -917,6 +966,8 @@ int main() {
 				drawnCard = playerHand.drawTopCard();
 				drawnDeck.placeCardAtTop(drawnCard);
 			}
+			coords(0, 36);
+			cout << undoPlace;
 			break;
 		case 14: //place all your held cards onto a stack
 			takeableCards = playerHand.getCards().size();
@@ -968,6 +1019,7 @@ int main() {
 		case 15: //sort your held card into its suit stack
 			if (playerHand.getCards().size() == 1) { //only allow when the player only has one card
 				drawnCard = playerHand.drawTopCard();
+				SetConsoleTextAttribute(hConsole, colours["whiteText"]);
 				if (drawnCard.getHouse() == "diamonds") { //if your card is a diamond
 					if (diamonds.getCards().size() == 0) { //if the diamonds are empty
 						if (drawnCard.getValue() == "A") { //and yours is an ace
@@ -1069,7 +1121,7 @@ int main() {
 					spades.stack(63, 19);
 				}
 				//if any successful placement was made
-				if (undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0) {
+				if (8 > undoPlace && undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0) {
 					stacks[undoPlace]->flipSpecific(stacks[undoPlace]->getCards().size() - 1, true); //show the next card on the stack where the sorted card was originally
 				}
 			}
@@ -1098,13 +1150,13 @@ int main() {
 		case 20: //sets blackjack to solo mode
 			groupType = "solo";
 			break;
-		case 21:
+		case 21: //sets blackjack to group mode
 			groupType = "group";
 			break;
-		case 22:
-			if (standardDeck.getCards().size() < 12) {
-				standardDeck.empty();
-				for (int i = 0; i < decks; i++) {
+		case 22: //enters the blackjack setup scene
+			if (standardDeck.getCards().size() < 12) { //check if there are enough cards left to play
+				standardDeck.empty(); //if there aren't, remove the remaining
+				for (int i = 0; i < decks; i++) { //and bring in new cards to the player decided deck count
 					standardDeck.copyAll(&resetDeck);
 				}
 			}
@@ -1115,12 +1167,58 @@ int main() {
 				gamemode = 7;
 			}
 			break;
+		case 23: //sets Solitaire difficulty
+			difficulty = 1;
+			break;
+		case 24: //sets solitaire difficulty
+			difficulty = 3;
+			break;
+		case 25: //enters solitaire
+			gamemode = 3;
+			break;
+		case 26: //solitaire taking from the sorted cards
+			//int which = currentUI.getSelectionVal()[1];
+			clearSolitaireButtons();
+			switch (currentUI.getSelectionVal()[1]) {
+			case 1:
+				if (diamonds.getCards().size() > 0) {
+					drawnCard = diamonds.drawTopCard();
+					playerHand.placeCardAtTop(drawnCard);
+					undoPlace = 8;
+				}
+				break;
+			case 2:
+				if (clubs.getCards().size() > 0) {
+					drawnCard = clubs.drawTopCard();
+					playerHand.placeCardAtTop(drawnCard);
+					undoPlace = 9;
+				}
+				break;
+			case 3:
+				if (hearts.getCards().size() > 0) {
+					drawnCard = hearts.drawTopCard();
+					playerHand.placeCardAtTop(drawnCard);
+					undoPlace = 10;
+				}
+				break;
+			case 4:
+				if (spades.getCards().size() > 0) {
+					drawnCard = spades.drawTopCard();
+					playerHand.placeCardAtTop(drawnCard);
+					undoPlace = 11;
+				}
+				break;
+			}
+			break;
 		default: //unregistered button
 			break;
 		}
 
 		GetWindowRect(console, &r);
-		MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
+		if (r.top + 727 != r.bottom || r.left + 1283 != r.right) {
+			clearScreen();
+			MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //forces the window to stay at 720p (maybe a bad idea)
+		}
 		//Sleep(1000);
 		//clearScreen();
 	}

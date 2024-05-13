@@ -29,6 +29,7 @@ namespace gf {
     static void clearScreen();
     static void drawBigSpade();
     static void rect(int x, int y, int w, int h, string colour);
+    static int findMinDiff(int x, vector<int> y);
 }
 
 void gf::coords(int x, int y) {
@@ -41,7 +42,7 @@ void gf::coords(int x, int y) {
     SetConsoleCursorPosition(hConsole, coord); //puts the cursor at the specified position in the console
 }
 
-void gf::clearScreen() {
+void gf::clearScreen() { //clears the entire screen
     COORD topLeft = { 0, 0 }; //defines the starting position of the console
     HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE); //gets the console
     CONSOLE_SCREEN_BUFFER_INFO screen;
@@ -136,4 +137,16 @@ void gf::rect(int x, int y, int w, int h, string colour) {
             cout << " ";
         }
     }
+}
+
+int gf::findMinDiff(int x, vector<int> y) { //finds the int in y that is closest in value to x, returns result as an index of y
+    int closest = 0;
+    for (int i = 0; i < y.size(); i++) { //iterates through every value in y
+        y[i] = y[i] - x; //works out the distance from x
+        y[i] = abs(y[i]); //ignoring positive/negativeness
+        if (y[i] < y[closest]) { //if the current value is smaller than the previous closest
+            closest = i; //overwrite which one is closest
+        }
+    }
+    return closest;
 }

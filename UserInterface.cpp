@@ -44,12 +44,16 @@ void UserInterface::highlightSelected() { //draws a border around the currently 
 }
 
 void UserInterface::selectionMoveUp() { //moves the button cursor upwards
+	int prevDispX = buttons[this->selected[1]][this->selected[0]].getX(); //gets the display location of the button highlighted before movement is appllied
 	if (this->selected[1] > 0) { //if a button is available in the up direction
 		this->selected[1] -= 1; //move the selection up by one
 	}
-	if (this->selected[0] >= this->buttons[this->selected[1]].size()) { //If the new selection position is OOB on the other axis
-		this->selected[0] = this->buttons[this->selected[1]].size() - 1; //bring it back in
+	vector<int> newRowDispXs; //stores the X position of every Button on the newly selected row
+	for (int i = 0; i < buttons[this->selected[1]].size(); i++) {
+		newRowDispXs.push_back(buttons[this->selected[1]][i].getX());
 	}
+	int newButtonX = findMinDiff(prevDispX, newRowDispXs);
+	this->selected[0] = newButtonX; //moves the cursor horizontally to the one nearest to the previous selection
 }
 
 void UserInterface::selectionMoveRight() { //moves button cursor rightwards
@@ -59,12 +63,16 @@ void UserInterface::selectionMoveRight() { //moves button cursor rightwards
 }
 
 void UserInterface::selectionMoveDown() { //move button cursor downwards
+	int prevDispX = buttons[this->selected[1]][this->selected[0]].getX(); //gets the display location of the button highlighted before movement is appllied
 	if (this->selected[1] < this->buttons.size() - 1) { //if another row exists below
 		this->selected[1] += 1;
 	}
-	if (this->selected[0] >= this->buttons[this->selected[1]].size()) { //If the new selection position is OOB on the other axis
-		this->selected[0] = this->buttons[this->selected[1]].size() - 1; //bring it back in
+	vector<int> newRowDispXs; //stores the X position of every Button on the newly selected row
+	for (int i = 0; i < buttons[this->selected[1]].size(); i++) {
+		newRowDispXs.push_back(buttons[this->selected[1]][i].getX());
 	}
+	int newButtonX = findMinDiff(prevDispX, newRowDispXs);
+	this->selected[0] = newButtonX; //moves the cursor horizontally to the one nearest to the previous selection
 }
 
 void UserInterface::selectionMoveLeft() { //move button cursor leftwards
