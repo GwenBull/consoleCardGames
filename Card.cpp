@@ -9,8 +9,8 @@ Card::Card() {
 	this->isFaceUp = false;
 } //default constructor
 
-Card::Card(string house, string value, string colour, int xPos, int yPos) {
-	this->house = house;
+Card::Card(string suit, string value, string colour, int xPos, int yPos) {
+	this->suit = suit;
 	this->value = value;
 	this->colour = colour;
 	this->xPos = xPos;
@@ -18,8 +18,8 @@ Card::Card(string house, string value, string colour, int xPos, int yPos) {
 	this->isFaceUp = true;
 }
 
-string Card::getHouse() {
-	return this->house;
+string Card::getSuit() {
+	return this->suit;
 }
 
 string Card::getValue() {
@@ -57,15 +57,15 @@ void Card::setFace(bool faceUp) {
 
 void Card::render() {
 	if (this->isFaceUp) { //if the card is face up
+		rect(this->xPos, this->yPos, 5, 4, this->colour);
+		coords(this->xPos, this->yPos);
 		SetConsoleTextAttribute(hConsole, colours[this->colour]); //sets colour to this cards colour
 		gf::coords(this->xPos, this->yPos); //moves the cursor to the top left of this card
-		cout << this->value << "    "; //draws the first line of the card
-		gf::coords(this->xPos, this->yPos + 1); //continues to create a typical card row by row
-		cout << "  " << suits[this->house] << "  ";
-		gf::coords(this->xPos, this->yPos + 2);
-		cout << "     ";
-		gf::coords(this->xPos, this->yPos + 3);
-		cout << "    " << this->value;
+		cout << this->value; //draws the top left symbol
+		gf::coords(this->xPos + 2, this->yPos + 1); //
+		cout << suits[this->suit];
+		gf::coords(this->xPos + 4, this->yPos + 3);
+		cout << this->value;
 	}
 	else {
 		SetConsoleTextAttribute(hConsole, colours["blue"]);

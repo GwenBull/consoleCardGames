@@ -1020,7 +1020,7 @@ int main() {
 			if (playerHand.getCards().size() == 1) { //only allow when the player only has one card
 				drawnCard = playerHand.drawTopCard();
 				SetConsoleTextAttribute(hConsole, colours["whiteText"]);
-				if (drawnCard.getHouse() == "diamonds") { //if your card is a diamond
+				if (drawnCard.getSuit() == "diamonds") { //if your card is a diamond
 					if (diamonds.getCards().size() == 0) { //if the diamonds are empty
 						if (drawnCard.getValue() == "A") { //and yours is an ace
 							diamonds.placeCardAtTop(drawnCard); //start the diamonds stack
@@ -1045,7 +1045,7 @@ int main() {
 					}
 					diamonds.stack(63, 1);
 				}
-				else if (drawnCard.getHouse() == "clubs") { //operates the same as the diamonds
+				else if (drawnCard.getSuit() == "clubs") { //operates the same as the diamonds
 					if (clubs.getCards().size() == 0) {
 						if (drawnCard.getValue() == "A") {
 							clubs.placeCardAtTop(drawnCard);
@@ -1070,7 +1070,7 @@ int main() {
 					}
 					clubs.stack(63, 7);
 				}
-				else if (drawnCard.getHouse() == "hearts") {
+				else if (drawnCard.getSuit() == "hearts") {
 					if (hearts.getCards().size() == 0) {
 						if (drawnCard.getValue() == "A") {
 							hearts.placeCardAtTop(drawnCard);
@@ -1095,7 +1095,7 @@ int main() {
 					}
 					hearts.stack(63, 13);
 				}
-				else if (drawnCard.getHouse() == "spades") {
+				else if (drawnCard.getSuit() == "spades") {
 					if (spades.getCards().size() == 0) {
 						if (drawnCard.getValue() == "A") {
 							spades.placeCardAtTop(drawnCard);

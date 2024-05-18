@@ -5,7 +5,7 @@ using namespace std;
 class Card
 {
 private:
-	string house;
+	string suit;
 	string value;
 	int xPos;
 	int yPos;
@@ -16,9 +16,9 @@ public:
 
 	Card();
 
-	Card(string house, string value, string colour, int xPos, int yPos);
+	Card(string suit, string value, string colour, int xPos, int yPos);
 
-	string getHouse();
+	string getSuit();
 
 	string getValue();
 	
