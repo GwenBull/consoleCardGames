@@ -140,11 +140,13 @@ string Deck::blackJackValue(string display) { //calculates a hand's value in a g
 	//converts into a string to show only what the player knows about the hand
 	for (int i = 0; i < unknowns; i++) {
 		returnVal += "?";
-		if (i == unknowns - 1) {
+		if (i == unknowns - 1 && value > 0) {
 			returnVal += " + ";
 		}
 	}
-	returnVal += to_string(value);
+	if (value > 0) {
+		returnVal += to_string(value);
+	}
 
 	return returnVal;
 }
