@@ -23,14 +23,9 @@ void init() {
 	wcscpy_s(cfi.FaceName, L"Lucida Console"); //forces a font
 	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
 	GetWindowRect(console, &r);
-	MoveWindow(console, r.left, r.top, 1283, 727, TRUE); //makes the window 720p (the drawable dimensions are 154 by 40 ish)
-	//Numbers slightly off because things I don't understand make it not exactly the written numbers
-	//for (int i = 0; i < 256; i++) {
-	//	SetConsoleTextAttribute(hConsole, i);
-	//	cout << i << ": " << char(i) << "\n";
-	//}
-	//_getch();
-	clearScreen();
+	MoveWindow(console, r.left, r.top, 1283, 727, TRUE); 
+	//Makes console stay anchored at top left and 720p
+	//Numbers slightly off because the window is slightly off otherwise
 }
 
 void firstDeal(Deck* mainPile, Deck* dealer, Deck* player, Deck* ai1, Deck* ai2, Deck* ai3, Deck* ai4) {
