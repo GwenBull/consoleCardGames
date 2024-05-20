@@ -1007,7 +1007,7 @@ int main() {
 					playerHand.placeCardAtTop(drawnCard); //cancel if no stack
 				}
 			}
-			if (undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0 && playerHand.getCards().size() == 0) { //once your cards have been placed 
+			if (undoPlace < 8 && undoPlace > 0 && stacks[undoPlace]->getCards().size() > 0 && playerHand.getCards().size() == 0) { //once your cards have been placed 
 				stacks[undoPlace]->flipSpecific(stacks[undoPlace]->getCards().size() - 1, true); //reveal the next card from the stack that it was taken from
 			}
 			break;
