@@ -130,11 +130,11 @@ void gf::drawBigSpade() { //draws a big spade logo, for the main menu
 }
 
 void gf::rect(int x, int y, int w, int h, string colour) {
-    SetConsoleTextAttribute(hConsole, colours[colour]);
-    for (int i = 0; i < h; i++) {
-        coords(x, y + i);
-        for (int j = 0; j < w; j++) {
-            cout << " ";
+    SetConsoleTextAttribute(hConsole, colours[colour]); //sets rect colour
+    for (int i = 0; i < h; i++) { //iterates through the height of the rectangle
+        coords(x, y + i); //adjusts render line
+        for (int j = 0; j < w; j++) { //iterates through the width
+            cout << " "; //draws a blank space
         }
     }
 }
