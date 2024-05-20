@@ -8,12 +8,20 @@ private:
 	int x;
 	int y;
 	string text;
-	int function;
+	string function;
 
 public:
 	
-	Button(int x, int y, string text, int function);
+	Button(int x, int y, string text, string function);
 
 	void render();
+
+	int getX();
+
+	int getY();
+
+	string getText();
+
+	int getFunctionID();
 };
 

@@ -2,6 +2,10 @@
 #include "GlobalFunctions.h"
 using namespace std;
 
+Deck::Deck() {
+	this->cards = {};
+}
+
 Deck::Deck(vector<Card> cards) {
 	this->cards = cards;
 }
@@ -40,35 +44,52 @@ void Deck::showAll() {
 	}
 }
 
-void Deck::hideAll() {
+void Deck::hideAll() { //sets every Card in this Deck to face down
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setFace(false); //sets every Card in this Deck to face down
+		this->cards[i].setFace(false);
 	}
 }
 
-void Deck::flipSpecific(int which, bool face) {
+void Deck::flipSpecific(size_t which, bool face) { //uses size_t instead of int because vector.size() is a size_t, so the function uses it to prevent a compiler warning about truncation
+												   //which happens when casting size_t to int
 	this->cards[which].setFace(face);
 }
 
-void Deck::stack(int x, int y) {
+void Deck::stack(int x, int y) { //places this entire Deck at the specified position
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y); //places this entire Deck at the specified position
+		this->cards[i].setPos(x, y);
 	}
 }
 
-void Deck::spreadVert(int x, int y) {
+void Deck::spreadVert(int x, int y) { //distributes the Deck vertically from a specified position
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x, y + (i * 2)); //distributes the Deck vertically from a specified position
+		this->cards[i].setPos(x, y + (i * 2));
 	}
 }
 
-void Deck::spreadHoriz(int x, int y) {
+void Deck::spreadVertCompressed(int x, int y) { //distributes the Deck vertically from a specified position with a smaller gap
 	for (int i = 0; i < this->cards.size(); i++) {
-		this->cards[i].setPos(x + (i * 3), y); //distributes the Deck horizontally from a specified position
+		this->cards[i].setPos(x, y + i);
 	}
 }
 
-string Deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack
+void Deck::spreadVertLimited(int x, int y, int max) { //distributes the top n cards of the Deck vertically from a specified position
+	for (int i = 0; i < this->cards.size(); i++) {
+		this->cards[i].setPos(x, y);
+	}
+	for (int i = 0; i < max; i++) {
+		this->cards[this->cards.size() - (max - i)].setPos(x, y + (i * 2));
+	}
+}
+
+void Deck::spreadHoriz(int x, int y) { //distributes the Deck horizontally from a specified position
+	for (int i = 0; i < this->cards.size(); i++) {
+		this->cards[i].setPos(x + (i * 3), y);
+	}
+}
+
+string Deck::blackJackValue(string display) { //calculates a hand's value in a game of blackjack and returns it with some visual data attached
+											  //simplifies the function calls that need to be made when displaying opponents to the player
 	int value = 0;
 	int aces = 0;
 	int unknowns = 0;
@@ -119,18 +140,22 @@ string Deck::blackJackValue(string display) { //calculates a hand's value in a g
 	//converts into a string to show only what the player knows about the hand
 	for (int i = 0; i < unknowns; i++) {
 		returnVal += "?";
-		if (i == unknowns - 1) {
+		if (i == unknowns - 1 && value > 0) {
 			returnVal += " + ";
 		}
 	}
-	returnVal += to_string(value);
+	if (value > 0) {
+		returnVal += to_string(value);
+	}
 
 	return returnVal;
 }
 
-int Deck::blackJackValue(int raw) { //calculates a hand's value in a game of blackjack
+int Deck::blackJackValue(int display) { //calculates a hand's value in a game of blackjack
 	int value = 0;
 	int aces = 0;
+	//It has to do a load of ifs because card.value is a string, and they need to be added as ints, not concatenated
+	//And they have to be strings because some have a letter as their value
 	for (int i = 0; i < this->cards.size(); i++) {
 		if (this->cards[i].getValue() == "A") {
 			value += 11;
@@ -175,4 +200,30 @@ void Deck::renderAll() {
 	for (int i = 0; i < this->getCards().size(); i++) { //get every Card in the Deck
 		this->getCards()[i].render(); //and render it
 	}
+}
+
+void Deck::reverseCards() {
+	reverse(this->cards.begin(), this->cards.end());
+
+}
+
+void Deck::copyAll(Deck* otherDeck) { //moves a copy of each card in otherDeck to the deck calling the function (without removing them from otherDeck
+	int size = otherDeck->getCards().size();
+	for (int i = 0; i < size; i++) {
+		Card drawnCard = otherDeck->drawTopCard();
+		this->placeCardAtTop(drawnCard);
+		otherDeck->reverseCards();
+		otherDeck->placeCardAtTop(drawnCard);
+		otherDeck->reverseCards();
+	}
+}
+
+void Deck::empty() {
+	for (int i = 0; i < this->getCards().size(); i++) {
+		this->drawTopCard();
+	}
+}
+
+void Deck::moveCard(int index, int newX, int newY) {
+	this->cards[index].setPos(newX, newY);
 }

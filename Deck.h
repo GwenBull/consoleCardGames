@@ -9,6 +9,8 @@ private:
 	vector<Card> cards;
 
 public:
+	Deck();
+
 	Deck(vector<Card> cards);
 
 	void shuffle();
@@ -23,11 +25,15 @@ public:
 
 	void hideAll();
 
-	void flipSpecific(int which, bool face);
+	void flipSpecific(size_t which, bool face);
 
 	void stack(int x, int y);
 
 	void spreadVert(int x, int y);
+
+	void spreadVertCompressed(int x, int y);
+
+	void spreadVertLimited(int x, int y, int max);
 
 	void spreadHoriz(int x, int y);
 
@@ -36,4 +42,12 @@ public:
 	int blackJackValue(int raw);
 
 	void renderAll();
+
+	void reverseCards();
+
+	void copyAll(Deck* copyDeck);
+	
+	void empty();
+
+	void moveCard(int index, int newX, int newY);
 };
