@@ -769,6 +769,7 @@ int main() {
 			cout << "Total: " << dealerHand.blackJackValue("string");
 			break;
 		case 9: //BlackJack options menu
+			drawBigSpade();
 			currentUI.copyButtons(&choicesBlackJack);
 			coords(12, 9);
 			if (currentUI.getSelectionVal()[1] == 0) { //work out the highlighted option and explain it
@@ -799,6 +800,7 @@ int main() {
 			cout << "selected: " << groupType << " ";
 			break;
 		case 10: //Solitaire options menu
+			drawBigSpade();
 			currentUI.copyButtons(&choicesSolitaire);
 			coords(12, 9);
 			if (currentUI.getSelectionVal()[1] == 0) {
