@@ -52,7 +52,7 @@ void firstDealSolo(Deck* mainPile, Deck* dealer, Deck* player) {
 		for (int j = 2; j < 6; j+=3) { //for each player + dealer
 			Sleep(208); //wait a reasonable time
 			drawnCard = mainPile->drawTopCard(); //draw a Card
-			if (j == 2 || (j == 6 && i == 1)) { //if it's the player's Card or the dealers last Card
+			if (j == 2 || i == 1) { //if it's the player's Card or the dealers last Card
 				drawnCard.flip(); //make it visible
 			}
 			if (j > 6) {
