@@ -694,7 +694,7 @@ int main() {
 			switch (whoseTurn) {
 			case -1:
 				whoseTurn++; //gives a single cycle of "wait time" so the player doesn't miss anything
-				break;
+				continue;
 			case 0:
 				currentUI.copyButtons(&blackJackMenu);
 				break;
@@ -961,8 +961,6 @@ int main() {
 				drawnCard = playerHand.drawTopCard();
 				drawnDeck.placeCardAtTop(drawnCard);
 			}
-			coords(0, 36);
-			cout << undoPlace;
 			break;
 		case 14: //place all your held cards onto a stack
 			takeableCards = playerHand.getCards().size();
@@ -1172,14 +1170,13 @@ int main() {
 			gamemode = 3;
 			break;
 		case 26: //solitaire taking from the sorted cards
-			//int which = currentUI.getSelectionVal()[1];
-			clearSolitaireButtons();
 			switch (currentUI.getSelectionVal()[1]) {
 			case 1:
 				if (diamonds.getCards().size() > 0) {
 					drawnCard = diamonds.drawTopCard();
 					playerHand.placeCardAtTop(drawnCard);
 					undoPlace = 8;
+					clearSolitaireButtons();
 				}
 				break;
 			case 2:
@@ -1187,6 +1184,7 @@ int main() {
 					drawnCard = clubs.drawTopCard();
 					playerHand.placeCardAtTop(drawnCard);
 					undoPlace = 9;
+					clearSolitaireButtons();
 				}
 				break;
 			case 3:
@@ -1194,6 +1192,7 @@ int main() {
 					drawnCard = hearts.drawTopCard();
 					playerHand.placeCardAtTop(drawnCard);
 					undoPlace = 10;
+					clearSolitaireButtons();
 				}
 				break;
 			case 4:
@@ -1201,6 +1200,7 @@ int main() {
 					drawnCard = spades.drawTopCard();
 					playerHand.placeCardAtTop(drawnCard);
 					undoPlace = 11;
+					clearSolitaireButtons();
 				}
 				break;
 			}
