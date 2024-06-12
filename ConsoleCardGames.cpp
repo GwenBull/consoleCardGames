@@ -4,6 +4,27 @@
 using namespace std;
 using namespace gf;
 
+//TO DO
+// Make named CONSTs for the number attached to each game mode to make them easier to manage. (const mainU below is proof this works, but please make a verbose standard format like menuGameMode, solitairePlayGamemode)
+// Standardise more variables (e.g. colours)
+// Rewrite card rendering to allow for corner text >1 character
+// Look into full mouse control again (https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mouse_event)
+// New card symbols are
+// ☺ (\u0001) and ☻ (\u0002) for jokers, 
+// ♫ (\u000E), ☼ (\u000F), ♂ (\u000B) and ♀ (\u000C) for the additional discworld suits.
+// ↔ (\u001D) for Uno reverse, Ø (\u009D) for Uno block and ┼ (\u00C5) for Uno wild
+//games to add:
+// Snap
+// Poker
+// Sabacc from Star Wars (George Lucas, 1977)
+// Caravan from Fallout: New Vegas (Obsidian Entertainment, 2010)
+// Tycoon from Persona 5: The Royal (Atlus, 2019)
+// Cripple Mr Onion from Discworld (Terry Pratchett, 1983)
+// More Solitaire variations (Decade, Pyramid, Spider, etc)
+// Uno (Merle Robbins, 1971)
+// Bridge
+// Every other regular cards game
+ 
 //Global constants
 ///blackJack Coordinates of various things
 const vector<vector<int>> talkCoords = { {25, 10}, {50, 20}, {75, 28}, {100, 20}, {125, 10}, {75, 0} }; //the coordinates of each player's text box
@@ -11,6 +32,8 @@ const vector<vector<int>> handCoords = { {25, 11}, {50, 21}, {75, 29}, {100, 21}
 const vector<vector<int>> scoreCoords = { {25, 15}, {50, 25}, {75, 33}, {100, 25}, {125, 15}, {75, 5} }; //the coordinates of each player's score display
 ///solitaire coordinates of various things
 const vector<vector<int>> stackCoords = { {14, 1}, {21, 1}, {28, 1}, {35, 1}, {42, 1}, {49, 1}, {56, 1} }; //the coordinates of the active play card stacks
+
+const int mainU = 0;
 
 void init() {
 	CONSOLE_FONT_INFOEX cfi;
@@ -26,6 +49,12 @@ void init() {
 	MoveWindow(console, r.left, r.top, 1283, 727, TRUE); 
 	//Makes console stay anchored at top left and 720p
 	//Numbers slightly off because the window is slightly off otherwise
+	//for (int i = 0; i < 256; i++) {
+	//	//SetConsoleTextAttribute(hConsole, i);
+	//	cout << i << ": " << char(i) << "\n";
+	//}
+	//_getch();
+	//clearScreen();
 }
 
 void firstDeal(Deck* mainPile, Deck* dealer, Deck* player, Deck* ai1, Deck* ai2, Deck* ai3, Deck* ai4) {
@@ -317,7 +346,7 @@ int main() {
 
 	while (true){ //main game loop
 		switch (gf::gamemode) {
-		case 0: //shows the main menu
+		case mainU: //shows the main menu
 			currentUI.copyButtons(&mainMenu);
 			drawBigSpade();
 			coords(0, 42);
