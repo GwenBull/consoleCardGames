@@ -16,13 +16,15 @@ using namespace gf;
 //games to add:
 // Snap
 // Poker
-// Sabacc from Star Wars (George Lucas, 1977)
-// Caravan from Fallout: New Vegas (Obsidian Entertainment, 2010)
-// Tycoon from Persona 5: The Royal (Atlus, 2019)
-// Cripple Mr Onion from Discworld (Terry Pratchett, 1983)
+// Sabacc 
+// Caravan from Fallout: New Vegas
+// Tycoon from Persona 5: The Royal
+// Cripple Mr Onion from Discworld
 // More Solitaire variations (Decade, Pyramid, Spider, etc)
-// Uno (Merle Robbins, 1971)
+// Uno
+// Dos
 // Bridge
+// Chemicards
 // Every other regular cards game
  
 //Global constants
